@@ -25,5 +25,6 @@ CATALOG: tuple[CatalogFeature, ...] = (
     CatalogFeature("website", "Website /w", "Offentlige Markdown-sider på dansk og engelsk", "platform"),
     CatalogFeature("heatmaps", "Heatmaps", "Klik- og scroll-heatmaps pr. side", "admin"),
     CatalogFeature("gdpr-export", "GDPR-eksport", "Samlet eksport ved anmodning om indsigt", "admin"),
+    CatalogFeature("klasse", "Klasse", "GitHub-klasser: lærer forbinder en organisation, hver elev får sit eget repo", "bruger"),
     CatalogFeature("gaer-sync", "Hent opdateringer", "Træk ændringer fra gaer-base ind i din fork", "platform"),
 )

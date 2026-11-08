@@ -21,6 +21,7 @@ export type AdminUser = {
   active_sessions: number;
   impersonation_only?: boolean;
   feature_ring?: number | null;
+  is_teacher?: boolean;
 };
 
 export type UsersResponse = { items: AdminUser[]; total: number; grace_logins: number };

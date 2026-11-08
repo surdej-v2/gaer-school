@@ -42,6 +42,7 @@ async def list_users(q: str | None = None, limit: int = 100, offset: int = 0, ad
             select u.id, u.email, u.phone, u.display_name, u.role, u.super_admin, u.grace_logins_used, u.blocked_at,
                    u.created_at, u.last_login_at, u.impersonation_only, u.mfa_required,
                    (select ring from feature_rings r where r.user_id = u.id) as feature_ring,
+                   exists (select 1 from teachers t where t.user_id = u.id) as is_teacher,
                    (select count(*) from passkeys p where p.user_id = u.id) as passkeys,
                    (select count(*) from totp_factors t where t.user_id = u.id and t.confirmed_at is not null) as totp,
                    (select count(*) from sessions s where s.user_id = u.id and s.revoked_at is null

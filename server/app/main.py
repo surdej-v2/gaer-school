@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import config, db, mail, retention
-from app.routes import (admin, ai, app_store, auth, clips, features, files, impersonation, me, office, public,
+from app.routes import (admin, ai, app_store, auth, classroom, clips, features, files, impersonation, me, office, public,
                         security, web)
 from app.security import bootstrap_admin_email, bootstrap_admin_phone
 from app.sessions import optional_principal
@@ -20,7 +20,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 # Requests that change state must carry this header. Browsers cannot add it cross-site
 # without a CORS preflight, which we never allow, so it stops CSRF together with SameSite cookies.
 CSRF_HEADER = "x-gaer"
-CSRF_EXEMPT = {"/api/collect"}  # sendBeacon cannot set headers; the endpoint only appends anonymous events
+# sendBeacon cannot set headers (collect only appends anonymous events); GitHub cannot either (the webhook checks
+# its HMAC signature instead).
+CSRF_EXEMPT = {"/api/collect", "/api/public/github/webhook"}
 
 # Who may embed us: the app itself (heatmap previews, the Office shell) and, for the embeddable
 # routes, the browser extension and the Office hosts (Office on the web runs add-ins in iframes).
@@ -91,7 +93,7 @@ def create_app() -> FastAPI:
 
     for r in (auth.router, ai.router, me.router, security.router, files.router, clips.router, public.router, admin.router, app_store.router,
               features.router, features.admin_router, impersonation.router, office.router,
-              web.router, files.memory_router):
+              classroom.router, classroom.public_router, classroom.admin_router, web.router, files.memory_router):
         app.include_router(r)
 
     static_dir = os.path.abspath(config.settings.static_dir)
