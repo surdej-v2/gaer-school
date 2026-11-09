@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">/class: en elev uden klasser tilmelder sig med koden fra læreren</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#facc15"/></linearGradient>
+  </defs>
+  <rect width="1280" height="820" fill="#f8fafc"/>
+  <rect width="1280" height="40" fill="#e2e8f0"/>
+  <circle cx="22" cy="20" r="6" fill="#94a3b8"/><circle cx="42" cy="20" r="6" fill="#cbd5e1"/><circle cx="62" cy="20" r="6" fill="#cbd5e1"/>
+  <rect x="96" y="8" width="560" height="24" rx="12" fill="#ffffff"/>
+  <text x="114" y="25" font-size="13" fill="#64748b">jeres-skole.dk<tspan fill="#020817">/class?kode=K7PX-4M2Q</tspan></text>
+  <rect y="40" width="1280" height="56" fill="#ffffff"/><rect y="96" width="1280" height="1" fill="#e2e8f0"/>
+  <circle cx="93" cy="68" r="13" fill="url(#g)"/>
+  <text x="116" y="73" font-size="16" font-weight="700" fill="#020817">Gær School</text>
+  <g font-size="14" fill="#475569"><text x="884" y="73">Klip</text><text x="930" y="73">Filer</text><text x="1060" y="73">Konto</text></g>
+  <rect x="972" y="54" width="66" height="28" rx="8" fill="#f1f5f9"/><text x="1005" y="73" font-size="14" font-weight="600" fill="#020817" text-anchor="middle">Klasse</text>
+  <text x="1134" y="73" font-size="13" font-weight="500" fill="#020817">Log ud</text>
+  <text x="80" y="140" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1.2">GITHUB-KLASSER</text>
+  <text x="80" y="176" font-size="30" font-weight="700" fill="#020817" letter-spacing="-0.6">Klasse</text>
+  <rect x="968" y="138" width="232" height="40" rx="10" fill="#f1f5f9"/>
+  <rect x="972" y="142" width="80" height="32" rx="7" fill="#ffffff" stroke="#e2e8f0"/>
+  <g font-size="14" text-anchor="middle"><text x="1012" y="163" font-weight="600" fill="#020817">Oversigt</text><text x="1089" y="163" fill="#475569">Lærer</text><text x="1161" y="163" fill="#475569">Elev</text></g>
+
+  <!-- join -->
+  <rect x="80" y="200" width="552" height="176" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="104" y="236" font-size="18" font-weight="700" fill="#020817">Tilmeld en klasse</text>
+  <text x="104" y="268" font-size="13" font-weight="600" fill="#020817">Kode fra din lærer</text>
+  <rect x="104" y="280" width="392" height="44" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text x="120" y="308" font-size="16" font-weight="600" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">K7PX-4M2Q</text>
+  <rect x="506" y="280" width="102" height="44" rx="8" fill="#2563eb"/><text x="557" y="307" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">Tilmeld</text>
+  <text x="104" y="352" font-size="13" fill="#64748b">Koden er udfyldt fra linket, din lærer sendte.</text>
+
+  <!-- how it works -->
+  <rect x="648" y="200" width="552" height="176" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="672" y="236" font-size="18" font-weight="700" fill="#020817">Sådan virker det</text>
+  <g font-size="14" fill="#64748b">
+    <text x="672" y="268">Din lærer giver dig en kode. Når du har tilmeldt dig og</text>
+    <text x="672" y="290">forbundet din GitHub-konto, får du dit eget repo i</text>
+    <text x="672" y="312">skolens organisation, hvor du er admin.</text>
+  </g>
+
+  <!-- after joining -->
+  <rect x="80" y="408" width="1120" height="250" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-dasharray="4 4"/>
+  <text x="104" y="440" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1">EFTER TILMELDING</text>
+  <rect x="104" y="458" width="520" height="44" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+  <text x="120" y="485" font-size="14" fill="#166534">Du er tilmeldt 9.B Webudvikling.</text>
+  <g font-size="14" fill="#334155">
+    <rect x="104" y="522" width="340" height="112" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <circle cx="130" cy="552" r="12" fill="#020817"/><text x="130" y="557" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="152" y="557" font-weight="700" fill="#020817">Forbind GitHub</text>
+    <text x="124" y="590" font-size="13" fill="#64748b">Vi gemmer kun dit brugernavn.</text>
+    <text x="124" y="610" font-size="13" fill="#64748b">Du logger stadig ind i Gær.</text>
+    <rect x="464" y="522" width="340" height="112" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <circle cx="490" cy="552" r="12" fill="#020817"/><text x="490" y="557" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="512" y="557" font-weight="700" fill="#020817">Accepter invitationen</text>
+    <text x="484" y="590" font-size="13" fill="#64748b">GitHub inviterer dig til skolens</text>
+    <text x="484" y="610" font-size="13" fill="#64748b">organisation.</text>
+    <rect x="824" y="522" width="352" height="112" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <circle cx="850" cy="552" r="12" fill="#020817"/><text x="850" y="557" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="872" y="557" font-weight="700" fill="#020817">Dit repo er klar</text>
+    <text x="844" y="590" font-size="13" fill="#64748b">En privat kopi af lærerens skabelon,</text>
+    <text x="844" y="610" font-size="13" fill="#64748b">hvor du er admin.</text>
+  </g>
+</svg>

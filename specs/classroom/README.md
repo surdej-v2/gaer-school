@@ -12,6 +12,21 @@ https://claude.ai/artifact/9kcLpSHD1VfAQAeXhPf1F1
 
 Behind feature `klasse` (ring 1). Raise the ring in `/admin/features` when it is ready for everyone.
 
+## Screens
+
+SVG illustrations of every `/class` screen, in `screens/`:
+
+| Screen | File |
+| --- | --- |
+| `/class`, teacher with an organisation: key figures, classes, "Kræver handling" | [class-oversigt.svg](screens/class-oversigt.svg) |
+| `/class`, teacher without an organisation: *Forbind organisation* | [class-forbind.svg](screens/class-forbind.svg) |
+| `/class/teacher?ny=1`: new class from a template repo | [class-ny-klasse.svg](screens/class-ny-klasse.svg) |
+| `/class/teacher?klasse=…`: join code, students, repos and status | [class-klasse.svg](screens/class-klasse.svg) |
+| `/class/student`: "Kom i gang", own classes, clone command | [class-elev.svg](screens/class-elev.svg) |
+| `/class`, student without classes: join with a code | [class-tilmeld.svg](screens/class-tilmeld.svg) |
+
+Names, codes and figures in the illustrations are sample data.
+
 ## Decisions (defaults)
 
 - **Template, not fork.** GitHub cannot fork a repo into the organisation it already lives in. Each student repo is

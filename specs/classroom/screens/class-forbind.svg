@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">/class: første gang for en lærer, uden forbundet GitHub-organisation</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#facc15"/></linearGradient>
+  </defs>
+  <rect width="1280" height="820" fill="#f8fafc"/>
+  <rect width="1280" height="40" fill="#e2e8f0"/>
+  <circle cx="22" cy="20" r="6" fill="#94a3b8"/><circle cx="42" cy="20" r="6" fill="#cbd5e1"/><circle cx="62" cy="20" r="6" fill="#cbd5e1"/>
+  <rect x="96" y="8" width="560" height="24" rx="12" fill="#ffffff"/>
+  <text x="114" y="25" font-size="13" fill="#64748b">jeres-skole.dk<tspan fill="#020817">/class</tspan></text>
+  <rect y="40" width="1280" height="56" fill="#ffffff"/><rect y="96" width="1280" height="1" fill="#e2e8f0"/>
+  <circle cx="93" cy="68" r="13" fill="url(#g)"/>
+  <text x="116" y="73" font-size="16" font-weight="700" fill="#020817">Gær School</text>
+  <g font-size="14" fill="#475569"><text x="838" y="73">Klip</text><text x="884" y="73">Filer</text><text x="1006" y="73">Konto</text><text x="1060" y="73">Admin</text></g>
+  <rect x="926" y="54" width="66" height="28" rx="8" fill="#f1f5f9"/><text x="959" y="73" font-size="14" font-weight="600" fill="#020817" text-anchor="middle">Klasse</text>
+  <text x="1134" y="73" font-size="13" font-weight="500" fill="#020817">Log ud</text>
+  <text x="80" y="140" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1.2">GITHUB-KLASSER</text>
+  <text x="80" y="176" font-size="30" font-weight="700" fill="#020817" letter-spacing="-0.6">Klasse</text>
+  <rect x="968" y="138" width="232" height="40" rx="10" fill="#f1f5f9"/>
+  <rect x="972" y="142" width="80" height="32" rx="7" fill="#ffffff" stroke="#e2e8f0"/>
+  <g font-size="14" text-anchor="middle"><text x="1012" y="163" font-weight="600" fill="#020817">Oversigt</text><text x="1089" y="163" fill="#475569">Lærer</text><text x="1161" y="163" fill="#475569">Elev</text></g>
+
+  <!-- connect card -->
+  <rect x="80" y="200" width="1120" height="164" rx="16" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="104" y="236" font-size="18" font-weight="700" fill="#020817">Forbind en GitHub-organisation</text>
+  <text x="104" y="264" font-size="14" fill="#64748b">Installer Gær GitHub App på skolens organisation. Så kan Gær oprette hold og repos og invitere elever.</text>
+  <text x="104" y="286" font-size="14" fill="#64748b">Sæt organisationens basisrettighed til <tspan font-weight="700" fill="#020817">No permission</tspan>, så eleverne kun ser deres egne repos.</text>
+  <rect x="104" y="306" width="186" height="40" rx="8" fill="#2563eb"/><text x="197" y="331" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">Forbind organisation</text>
+  <!-- what happens next -->
+  <g font-size="13" fill="#475569">
+    <rect x="760" y="226" width="416" height="116" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-dasharray="4 4"/>
+    <text x="780" y="252" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1">DET SKER BAGEFTER</text>
+    <circle cx="790" cy="272" r="9" fill="#020817"/><text x="790" y="276" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+    <text x="808" y="277">GitHub: vælg organisationen og installer appen</text>
+    <circle cx="790" cy="298" r="9" fill="#020817"/><text x="790" y="302" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+    <text x="808" y="303">GitHub: godkend Gær med din egen konto</text>
+    <circle cx="790" cy="324" r="9" fill="#020817"/><text x="790" y="328" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+    <text x="808" y="329">Tilbage her: organisationen står som Forbundet</text>
+  </g>
+
+  <!-- stats zero -->
+  <rect x="80" y="384" width="268" height="96" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="102" y="414" font-size="13" fill="#64748b">Klasser</text><text x="102" y="458" font-size="34" font-weight="700" fill="#020817">0</text>
+  <rect x="364" y="384" width="268" height="96" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="386" y="414" font-size="13" fill="#64748b">Elever</text><text x="386" y="458" font-size="34" font-weight="700" fill="#020817">0</text>
+  <rect x="648" y="384" width="268" height="96" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="670" y="414" font-size="13" fill="#64748b">Repos klar</text><text x="670" y="458" font-size="34" font-weight="700" fill="#020817">0</text>
+  <rect x="932" y="384" width="268" height="96" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="954" y="414" font-size="13" fill="#64748b">Afventer eller fejl</text><text x="954" y="458" font-size="34" font-weight="700" fill="#020817">0</text>
+
+  <!-- empty table -->
+  <text x="80" y="526" font-size="17" font-weight="700" fill="#020817">Mine klasser</text>
+  <rect x="80" y="540" width="816" height="96" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <path d="M81 580 H895" stroke="#e2e8f0"/>
+  <g font-size="12" font-weight="600" fill="#64748b"><text x="100" y="565">Klasse</text><text x="330" y="565">Skabelon</text><text x="540" y="565">Elever</text><text x="610" y="565">Repos klar</text><text x="770" y="565">Status</text></g>
+  <text x="100" y="613" font-size="14" fill="#64748b">Ingen klasser endnu.</text>
+
+  <rect x="920" y="508" width="280" height="128" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="942" y="542" font-size="17" font-weight="700" fill="#020817">Kræver handling</text>
+  <text x="942" y="570" font-size="13" fill="#64748b">Intet lige nu.</text>
+</svg>

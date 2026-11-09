@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">/class/teacher?ny=1: læreren opretter en ny klasse fra et skabelon-repo</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#facc15"/></linearGradient>
+  </defs>
+  <rect width="1280" height="820" fill="#f8fafc"/>
+  <rect width="1280" height="40" fill="#e2e8f0"/>
+  <circle cx="22" cy="20" r="6" fill="#94a3b8"/><circle cx="42" cy="20" r="6" fill="#cbd5e1"/><circle cx="62" cy="20" r="6" fill="#cbd5e1"/>
+  <rect x="96" y="8" width="560" height="24" rx="12" fill="#ffffff"/>
+  <text x="114" y="25" font-size="13" fill="#64748b">jeres-skole.dk<tspan fill="#020817">/class/teacher?ny=1</tspan></text>
+  <rect y="40" width="1280" height="56" fill="#ffffff"/><rect y="96" width="1280" height="1" fill="#e2e8f0"/>
+  <circle cx="93" cy="68" r="13" fill="url(#g)"/>
+  <text x="116" y="73" font-size="16" font-weight="700" fill="#020817">Gær School</text>
+  <g font-size="14" fill="#475569"><text x="838" y="73">Klip</text><text x="884" y="73">Filer</text><text x="1006" y="73">Konto</text><text x="1060" y="73">Admin</text></g>
+  <rect x="926" y="54" width="66" height="28" rx="8" fill="#f1f5f9"/><text x="959" y="73" font-size="14" font-weight="600" fill="#020817" text-anchor="middle">Klasse</text>
+  <text x="1134" y="73" font-size="13" font-weight="500" fill="#020817">Log ud</text>
+  <text x="80" y="140" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1.2">GITHUB-KLASSER</text>
+  <text x="80" y="176" font-size="30" font-weight="700" fill="#020817" letter-spacing="-0.6">Klasse</text>
+  <rect x="968" y="138" width="232" height="40" rx="10" fill="#f1f5f9"/>
+  <rect x="1056" y="142" width="66" height="32" rx="7" fill="#ffffff" stroke="#e2e8f0"/>
+  <g font-size="14" text-anchor="middle"><text x="1012" y="163" fill="#475569">Oversigt</text><text x="1089" y="163" font-weight="600" fill="#020817">Lærer</text><text x="1161" y="163" fill="#475569">Elev</text></g>
+
+  <!-- class list -->
+  <rect x="80" y="200" width="260" height="226" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="100" y="230" font-size="11" font-weight="700" fill="#64748b" letter-spacing="1.2">KLASSER</text>
+  <g font-size="14" fill="#020817">
+    <text x="112" y="268">9.B Webudvikling</text>
+    <text x="112" y="308">8.A Python</text>
+    <text x="112" y="348">Valgfag Spiludvikling</text>
+  </g>
+  <rect x="96" y="368" width="228" height="40" rx="8" fill="#eff6ff"/>
+  <text x="112" y="393" font-size="14" font-weight="600" fill="#1d4ed8">+ Ny klasse</text>
+
+  <!-- form -->
+  <rect x="364" y="200" width="836" height="310" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="390" y="238" font-size="18" font-weight="700" fill="#020817">Ny klasse</text>
+  <g font-size="13" font-weight="600" fill="#020817">
+    <text x="390" y="272">Organisation</text>
+    <text x="654" y="272">Navn</text>
+    <text x="918" y="272">Skabelon-repo</text>
+  </g>
+  <rect x="390" y="282" width="248" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="404" y="307" font-size="14" fill="#020817">demo-skole</text>
+  <path d="M614 298 l6 6 l6 -6" fill="none" stroke="#64748b" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="654" y="282" width="248" height="40" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text x="668" y="307" font-size="14" fill="#020817">7.C Kodning</text>
+  <rect x="751" y="292" width="1.5" height="20" fill="#020817"/>
+  <rect x="918" y="282" width="256" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="932" y="307" font-size="13" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">demo-skole/kodning-start</text>
+  <text x="390" y="358" font-size="13" fill="#64748b">Skabelonen skal være markeret som <tspan font-style="italic">Template repository</tspan> på GitHub. Hver elev får en privat kopi,</text>
+  <text x="390" y="378" font-size="13" fill="#64748b">hvor eleven er admin, og klassens lærerhold kan vedligeholde den.</text>
+  <rect x="390" y="404" width="126" height="40" rx="8" fill="#2563eb"/><text x="453" y="429" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">Opret klasse</text>
+  <text x="550" y="429" font-size="14" font-weight="500" fill="#020817">Annullér</text>
+
+  <!-- what Gær creates -->
+  <rect x="364" y="534" width="836" height="176" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-dasharray="4 4"/>
+  <text x="390" y="566" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1">DET OPRETTER GÆR PÅ GITHUB</text>
+  <g font-size="13" fill="#334155">
+    <rect x="390" y="584" width="250" height="100" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <text x="406" y="610" font-weight="700" fill="#020817">Elevhold</text>
+    <text x="406" y="632" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">demo-skole/7c-kodning</text>
+    <text x="406" y="656" fill="#64748b">Eleverne inviteres hertil.</text>
+    <rect x="656" y="584" width="250" height="100" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <text x="672" y="610" font-weight="700" fill="#020817">Lærerhold</text>
+    <text x="672" y="632" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">7c-kodning-laerere</text>
+    <text x="672" y="656" fill="#64748b">Maintain på alle elevrepos.</text>
+    <rect x="922" y="584" width="252" height="100" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <text x="938" y="610" font-weight="700" fill="#020817">Tilmeldingskode</text>
+    <text x="938" y="636" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="16" font-weight="700" fill="#020817">XXXX-XXXX</text>
+    <text x="938" y="660" fill="#64748b">Deles med eleverne.</text>
+  </g>
+</svg>

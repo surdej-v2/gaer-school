@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" font-family="Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t">
+  <title id="t">/class/teacher: en klasse med tilmeldingskode, elever, repos og status</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#facc15"/></linearGradient>
+  </defs>
+  <rect width="1280" height="820" fill="#f8fafc"/>
+  <rect width="1280" height="40" fill="#e2e8f0"/>
+  <circle cx="22" cy="20" r="6" fill="#94a3b8"/><circle cx="42" cy="20" r="6" fill="#cbd5e1"/><circle cx="62" cy="20" r="6" fill="#cbd5e1"/>
+  <rect x="96" y="8" width="560" height="24" rx="12" fill="#ffffff"/>
+  <text x="114" y="25" font-size="13" fill="#64748b">jeres-skole.dk<tspan fill="#020817">/class/teacher?klasse=1</tspan></text>
+  <rect y="40" width="1280" height="56" fill="#ffffff"/><rect y="96" width="1280" height="1" fill="#e2e8f0"/>
+  <circle cx="93" cy="68" r="13" fill="url(#g)"/>
+  <text x="116" y="73" font-size="16" font-weight="700" fill="#020817">Gær School</text>
+  <g font-size="14" fill="#475569"><text x="838" y="73">Klip</text><text x="884" y="73">Filer</text><text x="1006" y="73">Konto</text><text x="1060" y="73">Admin</text></g>
+  <rect x="926" y="54" width="66" height="28" rx="8" fill="#f1f5f9"/><text x="959" y="73" font-size="14" font-weight="600" fill="#020817" text-anchor="middle">Klasse</text>
+  <text x="1134" y="73" font-size="13" font-weight="500" fill="#020817">Log ud</text>
+  <text x="80" y="140" font-size="12" font-weight="700" fill="#64748b" letter-spacing="1.2">GITHUB-KLASSER</text>
+  <text x="80" y="176" font-size="30" font-weight="700" fill="#020817" letter-spacing="-0.6">Klasse</text>
+  <rect x="968" y="138" width="232" height="40" rx="10" fill="#f1f5f9"/>
+  <rect x="1056" y="142" width="66" height="32" rx="7" fill="#ffffff" stroke="#e2e8f0"/>
+  <g font-size="14" text-anchor="middle"><text x="1012" y="163" fill="#475569">Oversigt</text><text x="1089" y="163" font-weight="600" fill="#020817">Lærer</text><text x="1161" y="163" fill="#475569">Elev</text></g>
+
+  <!-- class list -->
+  <rect x="80" y="200" width="260" height="226" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="100" y="230" font-size="11" font-weight="700" fill="#64748b" letter-spacing="1.2">KLASSER</text>
+  <rect x="96" y="248" width="228" height="40" rx="8" fill="#eff6ff"/>
+  <g font-size="14" fill="#020817">
+    <text x="112" y="273" font-weight="600" fill="#1d4ed8">9.B Webudvikling</text>
+    <text x="112" y="313">8.A Python</text>
+    <text x="112" y="353">Valgfag Spiludvikling</text>
+  </g>
+  <text x="112" y="393" font-size="14" font-weight="600" fill="#475569">+ Ny klasse</text>
+
+  <!-- class header -->
+  <rect x="364" y="200" width="836" height="256" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="388" y="236" font-size="22" font-weight="700" fill="#020817" letter-spacing="-0.3">9.B Webudvikling</text>
+  <text x="388" y="260" font-size="13" fill="#64748b">Hold <tspan fill="#2563eb" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">demo-skole/9b-web</tspan> · skabelon <tspan fill="#2563eb" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">demo-skole/web-skabelon</tspan> · 26 elever</text>
+  <rect x="890" y="218" width="206" height="40" rx="8" fill="#2563eb"/><text x="993" y="243" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">Opret manglende repos (2)</text>
+  <rect x="1106" y="218" width="74" height="40" rx="8" fill="#ffffff" stroke="#e2e8f0"/><text x="1143" y="243" font-size="14" font-weight="500" fill="#020817" text-anchor="middle">Arkivér</text>
+  <!-- copy fields -->
+  <text x="388" y="296" font-size="13" font-weight="600" fill="#64748b">Tilmeldingskode til eleverne</text>
+  <rect x="388" y="306" width="292" height="36" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="402" y="329" font-size="14" font-weight="700" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">K7PX-4M2Q</text>
+  <rect x="690" y="306" width="72" height="36" rx="8" fill="#ffffff" stroke="#e2e8f0"/><text x="726" y="329" font-size="13" font-weight="500" fill="#020817" text-anchor="middle">Kopiér</text>
+  <text x="790" y="296" font-size="13" font-weight="600" fill="#64748b">Eller send linket</text>
+  <rect x="790" y="306" width="308" height="36" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="804" y="329" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">…/class/student?kode=K7PX-4M2Q</text>
+  <rect x="1108" y="306" width="72" height="36" rx="8" fill="#ffffff" stroke="#e2e8f0"/><text x="1144" y="329" font-size="13" font-weight="500" fill="#020817" text-anchor="middle">Kopiér</text>
+  <text x="388" y="378" font-size="13" fill="#64748b">Hver elev får <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" fill="#020817">9b-web-&lt;github-bruger&gt;</tspan> som privat kopi af skabelonen og er admin på det.</text>
+  <text x="388" y="398" font-size="13" fill="#64748b">Holdet <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12" fill="#020817">9b-web-laerere</tspan> kan vedligeholde alle repos. Ved kursets slut kan du overdrage et repo</text>
+  <text x="388" y="418" font-size="13" fill="#64748b">til elevens egen konto.</text>
+
+  <!-- students -->
+  <text x="364" y="494" font-size="17" font-weight="700" fill="#020817">Elever og repos</text>
+  <text x="1180" y="494" font-size="13" font-weight="500" fill="#020817" text-anchor="end">Opdatér</text>
+  <rect x="364" y="508" width="836" height="268" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <path d="M365 546 H1199" stroke="#e2e8f0"/>
+  <g font-size="12" font-weight="600" fill="#64748b"><text x="384" y="532">Elev</text><text x="560" y="532">GitHub</text><text x="680" y="532">Repo</text><text x="862" y="532">Status</text></g>
+  <!-- r1 -->
+  <text x="384" y="570" font-size="14" font-weight="700" fill="#020817">Asta Holm</text>
+  <text x="384" y="587" font-size="11" fill="#64748b">Tilmeldt 2. sep. 2026</text>
+  <text x="560" y="577" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">astaholm</text>
+  <text x="680" y="577" font-size="12" fill="#2563eb" font-family="ui-monospace, Menlo, Consolas, monospace" text-decoration="underline">9b-web-astaholm</text>
+  <rect x="862" y="565" width="108" height="22" rx="11" fill="#dcfce7"/><text x="916" y="580" font-size="12" font-weight="700" fill="#166534" text-anchor="middle">Admin på repo</text>
+  <rect x="1046" y="561" width="78" height="30" rx="7" fill="#ffffff" stroke="#e2e8f0"/><text x="1085" y="581" font-size="12" font-weight="500" fill="#020817" text-anchor="middle">Overdrag</text>
+  <rect x="1130" y="561" width="52" height="30" rx="7" fill="#fef2f2" stroke="#fecaca"/><text x="1156" y="581" font-size="12" font-weight="600" fill="#991b1b" text-anchor="middle">Fjern</text>
+  <path d="M365 604 H1199" stroke="#f1f5f9"/>
+  <!-- r2 -->
+  <text x="384" y="628" font-size="14" font-weight="700" fill="#020817">Malik Jensen</text>
+  <text x="384" y="645" font-size="11" fill="#64748b">Tilmeldt 3. sep. 2026</text>
+  <text x="560" y="635" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">malik-j</text>
+  <text x="680" y="635" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">9b-web-malik-j</text>
+  <rect x="862" y="623" width="118" height="22" rx="11" fill="#fef3c7"/><text x="921" y="638" font-size="12" font-weight="700" fill="#92400e" text-anchor="middle">Invitation sendt</text>
+  <rect x="1130" y="619" width="52" height="30" rx="7" fill="#fef2f2" stroke="#fecaca"/><text x="1156" y="639" font-size="12" font-weight="600" fill="#991b1b" text-anchor="middle">Fjern</text>
+  <path d="M365 662 H1199" stroke="#f1f5f9"/>
+  <!-- r3 -->
+  <text x="384" y="686" font-size="14" font-weight="700" fill="#020817">Sofie Lund</text>
+  <text x="384" y="703" font-size="11" fill="#64748b">Tilmeldt 3. sep. 2026</text>
+  <text x="560" y="693" font-size="12" fill="#64748b">—</text>
+  <text x="680" y="693" font-size="12" fill="#64748b">—</text>
+  <rect x="862" y="681" width="150" height="22" rx="11" fill="#fef3c7"/><text x="937" y="696" font-size="12" font-weight="700" fill="#92400e" text-anchor="middle">Mangler GitHub-konto</text>
+  <rect x="1130" y="677" width="52" height="30" rx="7" fill="#fef2f2" stroke="#fecaca"/><text x="1156" y="697" font-size="12" font-weight="600" fill="#991b1b" text-anchor="middle">Fjern</text>
+  <path d="M365 720 H1199" stroke="#f1f5f9"/>
+  <!-- r4 -->
+  <text x="384" y="744" font-size="14" font-weight="700" fill="#020817">Noah Berg</text>
+  <text x="384" y="761" font-size="11" fill="#64748b">Tilmeldt 4. sep. 2026</text>
+  <text x="560" y="751" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">noahb</text>
+  <text x="680" y="751" font-size="12" fill="#020817" font-family="ui-monospace, Menlo, Consolas, monospace">9b-web-noahb</text>
+  <rect x="862" y="734" width="44" height="22" rx="11" fill="#fee2e2"/><text x="884" y="749" font-size="12" font-weight="700" fill="#991b1b" text-anchor="middle">Fejl</text>
+  <text x="914" y="749" font-size="11" fill="#991b1b">GitHub svarede 422</text>
+  <rect x="1130" y="735" width="52" height="30" rx="7" fill="#fef2f2" stroke="#fecaca"/><text x="1156" y="755" font-size="12" font-weight="600" fill="#991b1b" text-anchor="middle">Fjern</text>
+  <text x="364" y="802" font-size="11" fill="#64748b">Lærere: [Lærerens navn] (laerer-gh)</text>
+</svg>
