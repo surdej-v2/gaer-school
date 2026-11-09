@@ -67,7 +67,11 @@
     },
     "/admin/files": {
       "title": "Filer",
-      "anchors": []
+      "anchors": [
+        "file-preview",
+        "file-row-{x}",
+        "files-browser"
+      ]
     },
     "/admin/gdpr": {
       "title": "GDPR-forespørgsler",
@@ -111,6 +115,16 @@
       "title": "MCP-servere",
       "anchors": [
         "mcp-drafts"
+      ]
+    },
+    "/admin/nats": {
+      "title": "NATS",
+      "anchors": [
+        "nats-health",
+        "nats-jetstream-summary",
+        "nats-kpis",
+        "nats-live",
+        "nats-tab-{x}"
       ]
     },
     "/admin/retention": {

@@ -30,6 +30,7 @@ import Settings from "./pages/Settings";
 import Mcp from "./pages/Mcp";
 import Webhooks from "./pages/Webhooks";
 import Jobs from "./pages/Jobs";
+import Nats from "./pages/Nats";
 import DataCatalog from "./pages/data/Catalog";
 import DataDataset from "./pages/data/Dataset";
 import DataExplore from "./pages/data/Explore";
@@ -87,12 +88,13 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="logs/auth" element={legacy(<AuthLog />)} />
                   <Route path="logs/audit" element={legacy(<AuditLog />)} />
                   <Route path="web" element={legacy(<Web />)} />
-                  <Route path="files" element={legacy(<AdminFiles />)} />
+                  <Route path="files" element={<AdminFiles />} />
                   <Route path="ai" element={legacy(<AiAdmin />)} />
                   <Route path="integrations" element={legacy(<Integrations />)} />
                   <Route path="mcp" element={<Mcp />} />
                   <Route path="webhooks" element={legacy(<Webhooks />)} />
                   <Route path="jobs" element={legacy(<Jobs />)} />
+                  <Route path="nats" element={<Nats />} />
                   <Route path="data" element={<DataCatalog />} />
                   <Route path="data/explore" element={<DataExplore />} />
                   <Route path="data/connect" element={<DataConnect />} />
