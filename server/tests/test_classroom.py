@@ -1,4 +1,4 @@
-"""/class: GitHub organisation, classes and student repos, against a fake GitHub (httpx.MockTransport)."""
+"""/school (API /api/class): GitHub organisation, classes and student repos, against a fake GitHub (httpx.MockTransport)."""
 
 import hashlib
 import hmac
@@ -12,7 +12,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from app import config, github
+from app import config, github, jobs
 from tests.helpers import full_user, otp_login
 
 ORG = "skole"
@@ -125,7 +125,7 @@ async def _connect_org(teacher) -> int:
     r = await teacher.get("/api/class/github/setup?installation_id=42&setup_action=install")
     assert r.status_code == 303 and r.headers["location"].startswith("https://github.com/login/oauth/authorize?")
     r = await teacher.get(f"/api/class/github/callback?code=mette-code&state={_state(r.headers['location'])}")
-    assert r.status_code == 303 and r.headers["location"] == f"/class/teacher?forbundet={ORG}", r.headers["location"]
+    assert r.status_code == 303 and r.headers["location"] == f"/school/teacher?forbundet={ORG}", r.headers["location"]
     me = (await teacher.get("/api/class/me")).json()
     assert me["github"]["account"]["login"] == "mette"
     return me["orgs"][0]["id"]
@@ -145,6 +145,7 @@ def _webhook(event: str, payload: dict) -> tuple[bytes, dict]:
 
 
 async def _status(student) -> dict:
+    await jobs.run_pending()  # provisioning runs as background jobs
     return (await student.get("/api/class/me")).json()["learning"][0]
 
 
@@ -166,7 +167,7 @@ async def test_teacher_connects_org_and_student_gets_own_repo(make_client, gh, o
     assert r.status_code == 200 and r.json()["joined"] is True
     assert (await _status(student))["status"] == "waiting_account"
 
-    assert await _link(student, "sara-code") == "/class/student?github=forbundet"
+    assert await _link(student, "sara-code") == "/school/student?github=forbundet"
     mine = await _status(student)
     assert mine["status"] == "invited" and mine["repo_url"] is None
     assert mine["invite_url"] == f"https://github.com/orgs/{ORG}/invitation"
@@ -273,7 +274,7 @@ async def test_install_needs_proof_of_access(make_client, gh):
     gh.installations_for = {}  # mette cannot reach installation 42
     r = await teacher.get("/api/class/github/setup?installation_id=42")
     r = await teacher.get(f"/api/class/github/callback?code=mette-code&state={_state(r.headers['location'])}")
-    assert r.headers["location"] == "/class/teacher?fejl=ingen-adgang"
+    assert r.headers["location"] == "/school/teacher?fejl=ingen-adgang"
     assert (await teacher.get("/api/class/me")).json()["orgs"] == []
 
 
@@ -283,9 +284,9 @@ async def test_state_is_bound_to_the_user(make_client, gh):
     await otp_login(b, "22222222")
     url = (await a.post("/api/class/github/start", json={"purpose": "link"})).json()["url"]
     r = await b.get(f"/api/class/github/callback?code=sara-code&state={_state(url)}")
-    assert r.headers["location"] == "/class?fejl=state"
+    assert r.headers["location"] == "/school?fejl=state"
     r = await b.get("/api/class/github/callback?code=sara-code&state=forged.abc")
-    assert r.headers["location"] == "/class?fejl=state"
+    assert r.headers["location"] == "/school?fejl=state"
     assert (await b.get("/api/class/me")).json()["github"]["account"] is None
 
 
@@ -294,7 +295,7 @@ async def test_one_github_account_per_user(make_client, gh):
     await otp_login(a, "11111111")
     await otp_login(b, "22222222")
     await _link(a, "sara-code")
-    assert await _link(b, "sara-code") == "/class/student?fejl=konto-i-brug"
+    assert await _link(b, "sara-code") == "/school/student?fejl=konto-i-brug"
 
 
 async def test_webhook_needs_signature(client, gh):
@@ -329,6 +330,7 @@ async def test_gdpr_export_and_erasure(make_client, gh, owner_conn):
     await otp_login(student, "22222222")
     await _link(student, "sara-code")
     await student.post("/api/class/join", json={"code": klass["join_code"]})
+    await jobs.run_pending()
 
     r = await student.get("/api/me/export")
     data = json.loads(zipfile.ZipFile(io.BytesIO(r.content)).read("data.json"))

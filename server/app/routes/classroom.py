@@ -7,17 +7,18 @@ repo. Students join with a code, link their GitHub account and get their own pri
 import json
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
-from app import classroom, db, github
+from app import classroom, db, github, school, settings_store
 from app.logs import audit
 from app.sessions import (Principal, current_user, optional_principal, request_meta, require_admin,
                           require_admin_stepup)
 
 router = APIRouter(prefix="/api/class", tags=["class"])
 public_router = APIRouter(prefix="/api/public/github", tags=["class"])
+legacy_router = APIRouter(include_in_schema=False)  # /class → /school (shared join links keep working)
 admin_router = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
 STATUS_DONE = ("ready", "transferred")
@@ -54,7 +55,10 @@ def _repo_links(org: str, repo: str | None, status: str | None, created: bool) -
 @router.get("/me")
 async def my_classes(p: Principal = Depends(current_user)):
     async with db.connection() as conn:
+        await school.apply_invites(conn, p.user_id, p.email, p.meta)
         teacher = await classroom.is_teacher(conn, p.user_id, p.role)
+        school_admin = await school.is_school_admin(conn, p.user_id, p.role)
+        can_create = school_admin or (teacher and bool(await settings_store.get(conn, "school_teachers_create_classes")))
         account = await db.fetch_one(conn, "select login, verified_at from github_accounts where user_id = %s",
                                      (p.user_id,))
         orgs = await db.fetch_all(conn, """
@@ -87,7 +91,7 @@ async def my_classes(p: Principal = Depends(current_user)):
         c.update(_repo_links(c["org"], c["repo_name"], c["status"], c.pop("repo_created")))
         c["invite_url"] = classroom.web_url("orgs", c["org"], "invitation")
     return {"github": {"configured": github.enabled(), "account": account},
-            "is_teacher": teacher, "orgs": orgs, "teaching": teaching, "learning": learning}
+            "is_teacher": teacher, "is_school_admin": school_admin, "can_create_classes": can_create, "orgs": orgs, "teaching": teaching, "learning": learning}
 
 
 # ── Linking a GitHub account and connecting an organisation ────────────────
@@ -121,22 +125,22 @@ async def github_setup(request: Request, installation_id: int | None = None, set
     if p is None or p.scope != "full":
         return RedirectResponse("/login", status_code=303)
     if not installation_id or not github.enabled():
-        return _back("/class/teacher", fejl="installation")
+        return _back("/school/teacher", fejl="installation")
     return RedirectResponse(github.authorize_url(classroom.sign_state(p.user_id, "install", installation_id)),
                             status_code=303)
 
 
 @router.get("/github/callback")
-async def github_callback(request: Request, background: BackgroundTasks, code: str | None = None,
+async def github_callback(request: Request, code: str | None = None,
                           state: str | None = None):
     p = await optional_principal(request)
     if p is None or p.scope != "full":
         return RedirectResponse("/login", status_code=303)
     data = classroom.read_state(state)
     if data is None or data.get("u") != p.user_id or not code or not github.enabled():
-        return _back("/class", fejl="state")
+        return _back("/school", fejl="state")
     install = data.get("p") == "install"
-    home = "/class/teacher" if install else "/class/student"
+    home = "/school/teacher" if install else "/school/student"
     try:
         token = await github.exchange_code(code)
         gh_user = await github.get_user(token)
@@ -190,7 +194,7 @@ async def github_callback(request: Request, background: BackgroundTasks, code: s
                             row_id=f"{org['id']}:{p.user_id}", after={"org": account["login"]})
             return _back(home, forbundet=account["login"])
 
-    background.add_task(classroom.provision_user, p.user_id, actor_id=p.user_id, meta=p.meta)
+        await classroom.enqueue_user(conn, p.user_id, p.user_id)
     return _back(home, github="forbundet")
 
 
@@ -221,6 +225,9 @@ async def create_class(body: ClassIn, p: Principal = Depends(current_user)):
         raise _not_configured()
     async with db.connection() as conn:
         await _require_teacher(conn, p)
+        if not await settings_store.get(conn, "school_teachers_create_classes") \
+                and not await school.is_school_admin(conn, p.user_id, p.role):
+            raise HTTPException(403, "På denne skole opretter skolens administrator klasserne")
         org = await db.fetch_one(conn, """
             select o.id, o.login, o.installation_id from github_orgs o
             join github_org_teachers t on t.org_id = o.id and t.user_id = %s
@@ -297,8 +304,8 @@ async def class_detail(class_id: int, p: Principal = Depends(current_user)):
 
 
 @router.post("/classes/{class_id}/provision")
-async def provision(class_id: int, background: BackgroundTasks, p: Principal = Depends(current_user)):
-    """Creates the missing repos and retries failed ones. Runs after the response; the page polls the class."""
+async def provision(class_id: int, p: Principal = Depends(current_user)):
+    """Creates the missing repos and retries failed ones as a background job; the page polls the class."""
     if not github.enabled():
         raise _not_configured()
     async with db.connection() as conn:
@@ -307,7 +314,7 @@ async def provision(class_id: int, background: BackgroundTasks, p: Principal = D
             raise HTTPException(409, "Klassen er arkiveret, eller organisationen er ikke længere forbundet")
         n = await db.fetch_one(conn, """select count(*) as n from student_repos where class_id = %s
                                         and status not in ('ready', 'transferred')""", (class_id,))
-    background.add_task(classroom.provision_class, class_id, actor_id=p.user_id, meta=p.meta)
+        await classroom.enqueue_class(conn, class_id, p.user_id)
     return {"queued": n["n"]}
 
 
@@ -372,7 +379,7 @@ class JoinIn(BaseModel):
 
 
 @router.post("/join")
-async def join(body: JoinIn, background: BackgroundTasks, p: Principal = Depends(current_user)):
+async def join(body: JoinIn, p: Principal = Depends(current_user)):
     code = body.code.strip().upper().replace(" ", "")
     if len(code) == 8 and "-" not in code:
         code = f"{code[:4]}-{code[4:]}"
@@ -386,6 +393,10 @@ async def join(body: JoinIn, background: BackgroundTasks, p: Principal = Depends
             if member["role"] == "teacher":
                 raise HTTPException(409, "Du er lærer i klassen")
             return {"id": c["id"], "name": c["name"], "joined": False}
+        if not await school.email_allowed(conn, p.email):
+            raise HTTPException(403, "Brug din skole-e-mail. Skift den under Konto, og prøv igen.")
+        if not await school.has_free_seat(conn, p.user_id):
+            raise HTTPException(409, "Skolen har ikke flere elevpladser. Kontakt skolens administrator.")
         account = await db.fetch_one(conn, "select login from github_accounts where user_id = %s", (p.user_id,))
         status = "pending" if account else "waiting_account"
         await conn.execute("insert into class_members (class_id, user_id, role) values (%s, %s, 'student')",
@@ -394,15 +405,15 @@ async def join(body: JoinIn, background: BackgroundTasks, p: Principal = Depends
                            (c["id"], p.user_id, status))
         await audit(conn, "create", actor_id=p.user_id, meta=p.meta, table="class_members",
                     row_id=f"{c['id']}:{p.user_id}", after={"class": c["name"], "role": "student", "status": status})
-    if account and github.enabled():
-        background.add_task(classroom.provision_student, c["id"], p.user_id, actor_id=p.user_id, meta=p.meta)
+        if account and github.enabled():
+            await classroom.enqueue_student(conn, c["id"], p.user_id, p.user_id)
     return {"id": c["id"], "name": c["name"], "joined": True}
 
 
 # ── Webhook from the GitHub App ────────────────────────────────────────────
 
 @public_router.post("/webhook")
-async def webhook(request: Request, background: BackgroundTasks):
+async def webhook(request: Request):
     body = await request.body()
     if not github.valid_signature(body, request.headers.get("x-hub-signature-256")):
         raise HTTPException(401, "Ugyldig signatur")
@@ -424,8 +435,8 @@ async def webhook(request: Request, background: BackgroundTasks):
                 join github_accounts ga on ga.user_id = sr.user_id
                 where o.installation_id = %s and lower(ga.login) = lower(%s) and sr.status = 'invited'""",
                 (installation_id, login or ""))
-        for u in users:
-            background.add_task(classroom.provision_user, u["user_id"], actor_id=None, meta=meta)
+            for u in users:
+                await classroom.enqueue_user(conn, u["user_id"], None)
         return {"ok": True, "students": len(users)}
 
     if event == "installation" and action == "deleted" and installation_id:
@@ -462,3 +473,13 @@ async def revoke_teacher(user_id: int, admin: Principal = Depends(require_admin_
             await audit(conn, "role.changed", actor_id=admin.user_id, meta=admin.meta, table="teachers",
                         row_id=user_id, before={"teacher": True}, after={"teacher": False})
     return {"ok": True}
+
+
+# ── /class moved to /school ────────────────────────────────────────────────
+
+@legacy_router.get("/class")
+@legacy_router.get("/class/{rest:path}")
+async def class_moved(request: Request, rest: str = ""):
+    target = "/school" + (f"/{rest}" if rest else "")
+    query = request.url.query
+    return RedirectResponse(f"{target}?{query}" if query else target, status_code=301)

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app import ai, db, settings_store
+from app import ai, db, school, settings_store
 from app.sessions import Principal, current_user
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
@@ -26,10 +26,13 @@ async def chat(body: ai.ChatIn, p: Principal = Depends(current_user)):
     async with db.connection() as conn:
         limit = await ai.limit_for(conn, p.user_id)
         used = await ai.used_this_month(conn, p.user_id)
+        school_left = await school.school_ai_left(conn)
         app_name = await settings_store.get(conn, "app_name")
     if limit <= 0:
         raise HTTPException(403, "AI er ikke slået til for din bruger")
     if used >= limit:
         raise HTTPException(429, "Du har brugt din AI-kvote for denne måned")
+    if school_left is not None and school_left <= 0:
+        raise HTTPException(429, "Skolens AI-kvote for denne måned er brugt. Kontakt skolens administrator.")
     return StreamingResponse(ai.stream_chat(body, p.user_id, app_name), media_type="text/event-stream",
                              headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})

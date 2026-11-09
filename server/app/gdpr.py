@@ -84,6 +84,14 @@ async def build_user_export(conn, user_id: int) -> dict:
                                  join github_orgs o on o.id = c.org_id
                                  left join student_repos sr on sr.class_id = m.class_id and sr.user_id = m.user_id
                                  where m.user_id = %s order by m.joined_at""", user_id),
+        "school_admin": await rows("select created_at from school_admins where user_id = %s", user_id),
+        "school_invites": await rows("""select email, role, created_at from school_invites
+                                        where email = (select email from users where id = %s)""", user_id),
+        "school_addon_orders": await rows("""select addon, quantity, status, ordered_at, cancelled_at from school_addons
+                                             where ordered_by = %s or cancelled_by = %s order by ordered_at""",
+                                          user_id, user_id),
+        "school_billing_contact": await rows("""select ean, invoice_reference, updated_at from school_subscription
+                                                where contact_user_id = %s""", user_id),
         "ai_usage": await rows("""select ts, surface, model, prompt_tokens, completion_tokens from ai_usage
                                   where user_id = %s order by ts""", user_id),
         "analytics_events": await rows("""select ts, kind, path, referrer, device, browser from analytics_events
@@ -149,7 +157,8 @@ async def erase_user(user_id: int, *, actor_id: int | None, meta: RequestMeta, r
                      gdpr_request: int | None = None) -> dict:
     """The right to be forgotten. Deletes the user (passkeys, authenticator apps, sessions, clips, domain consents, AI usage, one-time
     codes, feature level, review sessions and notes, test accounts, teacher grant, GitHub account link, class memberships
-    and student repo rows cascade; review screenshots and audio are files; feature usage is purged with the logs; repos
+    and student repo rows, school administrator grant and a pending school invitation cascade or are deleted; add-on orders
+    keep the order without the user; review screenshots and audio are files; feature usage is purged with the logs; repos
     on GitHub are not deleted), their files in Object Storage (their whole home, folders cascade; files they put in
     /shared stay, the link to them is set to null), the contact details on their GDPR requests, and
     log data about them (via the purge user). The erasure itself is logged without personal data."""
@@ -163,6 +172,8 @@ async def erase_user(user_id: int, *, actor_id: int | None, meta: RequestMeta, r
                                             then 'completed' else status end,
                               completed_at = coalesce(completed_at, now()), handled_by = coalesce(handled_by, %s)
                               where user_id = %s or id = %s""", (actor_id, user_id, gdpr_request))
+        if user.get("email"):
+            await conn.execute("delete from school_invites where email = %s", (user["email"].lower(),))
         await conn.execute("delete from users where id = %s", (user_id,))
         await audit(conn, "gdpr.erasure", actor_id=actor_id if actor_id != user_id else None, meta=meta,
                     table="users", row_id=user_id, reason=reason, gdpr_request=gdpr_request, files=len(files),

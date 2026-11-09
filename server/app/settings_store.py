@@ -22,6 +22,10 @@ DEFAULTS: dict = {
     "retention_mcp_log_days": 90,
     "retention_last_run": None,
     "ai_default_monthly_tokens": 200_000,   # per user; 0 turns AI off for users without their own limit
+    "school_student_email_domain": "",      # /school: students must use an e-mail ending in this domain ("" = any)
+    "school_teachers_create_classes": True, # /school: teachers may create classes (else only school administrators)
+    "school_ai_monthly_tokens": 0,          # /school: AI tokens per month for the whole school (0 = no cap)
+    "school_addon_prices": {},              # /school: price text per add-on key, set by a Gær admin
     "web_front": "markdown",                # /w/: "markdown" (slug '') or "facit246" (app/web_front.py); default: WEB_FRONT
 }
 

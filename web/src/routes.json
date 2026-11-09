@@ -73,18 +73,20 @@
   },
   {
    "id": "class",
-   "docs_path": "`/class`, `/class/teacher`, `/class/student`",
+   "docs_path": "`/school/teacher`, `/school/student`, `/school/admin`",
    "who": {
-    "en": "logged in (feature `klasse`, ring 1)",
-    "da": "logget ind (feature `klasse`, ring 1)"
+    "en": "logged in (feature `klasse`, ring 1); admin: school administrators",
+    "da": "logget ind (feature `klasse`, ring 1); admin: skoleadministratorer"
    },
    "what": {
-    "en": "**GitHub classes**: teachers (admin role, or granted in /admin/users) connect a GitHub organisation through the Gær GitHub App and create classes from a template repo; students join with a code, link their GitHub account and get their own private repo with admin rights.",
-    "da": "**GitHub-klasser**: lærere forbinder en GitHub-organisation og opretter klasser fra et skabelon-repo; elever tilmelder sig med en kode og får deres eget private repo."
+    "en": "**School and GitHub classes**: school administrators (admin role, or granted in /admin/users or /school/admin) manage teachers, students, classes, usage, the subscription and add-ons (invoiced by EAN); teachers connect a GitHub organisation through the Gær GitHub App and create classes from a template repo; students join with a code, link their GitHub account and get their own private repo with admin rights. `/class/…` redirects to `/school/…`.",
+    "da": "**Skole og GitHub-klasser**: skoleadministratorer styrer lærere, elever, klasser, forbrug, abonnement og tilkøb (EAN-faktura); lærere opretter klasser fra et skabelon-repo; elever tilmelder sig med en kode og får deres eget private repo. `/class/…` sendes videre til `/school/…`."
    },
    "code": [
-    "pages/class/",
+    "pages/school/",
+    "routes/school.py",
     "routes/classroom.py",
+    "school.py",
     "classroom.py"
    ]
   },
@@ -315,28 +317,43 @@
    "title": "Privatliv"
   },
   {
+   "path": "/school",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Skole",
+   "feature": "klasse"
+  },
+  {
+   "path": "/school/teacher",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Skole · lærer",
+   "feature": "klasse"
+  },
+  {
+   "path": "/school/student",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Skole · elev",
+   "feature": "klasse"
+  },
+  {
+   "path": "/school/admin",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Skole · administration",
+   "feature": "klasse"
+  },
+  {
    "path": "/class",
    "group": "class",
-   "app": "app",
-   "access": "user",
-   "title": "Klasser",
-   "feature": "klasse"
-  },
-  {
-   "path": "/class/teacher",
-   "group": "class",
-   "app": "app",
-   "access": "user",
-   "title": "Klasser · lærer",
-   "feature": "klasse"
-  },
-  {
-   "path": "/class/student",
-   "group": "class",
-   "app": "app",
-   "access": "user",
-   "title": "Klasser · elev",
-   "feature": "klasse"
+   "app": "server",
+   "access": "public",
+   "title": "Klasser (flyttet til /school)"
   },
   {
    "path": "/forbind",

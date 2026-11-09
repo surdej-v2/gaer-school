@@ -108,7 +108,8 @@ def clean_database():
                         features, feature_rings, feature_usage, app_store,
                         mcp_clients, mcp_tokens, mcp_drafts, mcp_log,
                         data_sources, datasets, dataset_fields,
-                        teachers, github_accounts, github_orgs, github_org_teachers, classes, class_members, student_repos
+                        teachers, github_accounts, github_orgs, github_org_teachers, classes, class_members, student_repos,
+                        school_admins, school_invites, school_subscription, school_addons, jobs
                         restart identity cascade""")
         # The features seeded by migration 0006 (truncate cascades to them via features.created_by).
         from app.features_catalog import CATALOG

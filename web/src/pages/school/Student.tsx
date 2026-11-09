@@ -1,4 +1,4 @@
-// /class/student: connect GitHub, accept the organisation's invitation, use your own repo.
+// /school/student: connect GitHub, accept the organisation's invitation, use your own repo.
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../../api";

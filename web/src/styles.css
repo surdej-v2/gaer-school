@@ -208,3 +208,16 @@ td.wrap { white-space: normal; word-break: break-word; }
 .class-step.now .step-num { background: var(--hm-primary); }
 .class-step.later .step-num { background: #e2e8f0; color: #334155; }
 .class-step .step-num { width: 28px; height: 28px; font-size: 13px; }
+
+/* /school/admin */
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--hm-border); }
+.tabs button { font: inherit; font-size: 14px; font-weight: 500; padding: 10px 14px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: transparent; color: var(--hm-muted-foreground); cursor: pointer; }
+.tabs button:hover { color: var(--hm-foreground); }
+.tabs button.active { color: #1d4ed8; border-bottom-color: var(--hm-primary); font-weight: 600; }
+.link-button { font: inherit; padding: 0; border: 0; background: none; color: var(--hm-primary); font-weight: 600; cursor: pointer; }
+.link-button:hover { text-decoration: underline; }
+.plain-list { list-style: none; margin: 0; padding: 0; }
+.plain-list li { padding: 10px 0; border-top: 1px solid var(--hm-muted); }
+.facts { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; font-size: 14px; }
+.facts dt { color: var(--hm-muted-foreground); }
+.facts dd { margin: 0; }
