@@ -1,10 +1,11 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { browserSupportsWebAuthn } from "@simplewebauthn/browser";
 import { api, errorText } from "../api";
 import { loginWithPasskey, passkeyErrorText, registerPasskey, useAuth, type LoginResult, type MfaMethod } from "../auth";
 import { SecondFactor } from "../security";
 import { Alert } from "../ui";
+import { solveCaptcha } from "../captcha";
 
 // After the code: users with "Kræv passkey" prove their second factor (step "mfa"); everybody else is logged in
 // and offered a passkey (step "offer"). Admins also see how many grace logins /admin has left.
@@ -34,7 +35,12 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
   const { user, scope, refresh, config } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? home;
+  // Where to go after login: state from RequireUser, or ?next= (same-site paths only) from /admin and MCP.
+  const next = new URLSearchParams(location.search).get("next");
+  const from = (location.state as { from?: string } | null)?.from
+    ?? (next && next.startsWith("/") && !next.startsWith("//") ? next : home);
+  // /admin is a separate app, so it needs a full page load.
+  const goFrom = () => (from === "/admin" || from.startsWith("/admin/") ? window.location.assign(from) : navigate(from, { replace: true }));
   const [step, setStep] = useState<Step>({ kind: "phone" });
   const [channel, setChannel] = useState<"email" | "phone">("email");
   const [phone, setPhone] = useState("");
@@ -47,15 +53,16 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
   // Arriving with a pending login (e.g. after a reload) goes straight to the second factor.
   useEffect(() => {
     if (user && scope === "mfa" && step.kind === "phone") setStep({ kind: "mfa", methods: user.mfa.methods });
-    if (user && scope === "full" && step.kind === "phone") navigate(from, { replace: true });
-  }, [user, scope, step.kind, navigate, from]);
+    if (user && scope === "full" && step.kind === "phone") goFrom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, scope, step.kind, from]);
 
   const after = async (res: LoginResult) => {
     await refresh();
     if (res.status === "mfa_required") setStep({ kind: "mfa", methods: res.methods });
     else if ((res.offer_passkey && supportsPasskey) || res.became_admin || (res.admin_grace_left ?? null) !== null)
       setStep({ kind: "offer", adminGraceLeft: res.admin_grace_left ?? null, becameAdmin: !!res.became_admin });
-    else navigate(from, { replace: true });
+    else goFrom();
   };
 
   const run = async (fn: () => Promise<void>, passkey = false) => {
@@ -70,10 +77,29 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
     }
   };
 
+  // The robot check is solved in the background while the person types, so sending the code is not slower.
+  const captcha = useRef<Promise<string | null> | null>(null);
+  const nextCaptcha = () => {
+    captcha.current = solveCaptcha();
+    captcha.current.catch(() => {}); // the error is shown when the code is sent
+  };
+  useEffect(() => {
+    if (config?.captcha && step.kind === "phone" && !captcha.current) nextCaptcha();
+  }, [config?.captcha, step.kind]);
+
   const sendCode = (e?: FormEvent) => {
     e?.preventDefault();
     run(async () => {
-      const res = await api.post<{ dev_code?: string }>("/api/auth/otp/start", contact);
+      let solution: string | null = null;
+      if (config?.captcha) {
+        if (!captcha.current) nextCaptcha();
+        try {
+          solution = await captcha.current;
+        } finally {
+          captcha.current = null; // a solution works once
+        }
+      }
+      const res = await api.post<{ dev_code?: string }>("/api/auth/otp/start", { ...contact, captcha: solution });
       setCode("");
       setStep({ kind: "code", devCode: res.dev_code });
     });
@@ -90,7 +116,7 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
     run(async () => {
       await registerPasskey();
       await refresh();
-      navigate(from, { replace: true });
+      goFrom();
     }, true);
 
   const passkeyLogin = () => run(async () => after(await loginWithPasskey()), true);
@@ -129,8 +155,13 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
               )}
               <Alert>{error}</Alert>
               <button className="btn btn-primary btn-block" disabled={busy || phone.trim().length < 6}>
-                Send kode
+                {busy && config?.captcha ? "Tjekker og sender …" : "Send kode"}
               </button>
+              {config?.captcha && (
+                <p className="muted tiny" style={{ textAlign: "center" }}>
+                  Et lille robottjek kører i din browser. Ingen cookies, intet sendes til andre.
+                </p>
+              )}
               {config?.sms_login && (
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setChannel(channel === "email" ? "phone" : "email"); setPhone(""); setError(null); }}>
                   {channel === "email" ? "Brug telefonnummer i stedet" : "Brug e-mail i stedet"}
@@ -182,7 +213,7 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
               {!supportsPasskey && <Alert kind="info">Din browser understøtter ikke passkeys. Du kan bruge en godkendelsesapp under Konto.</Alert>}
               <Alert>{error}</Alert>
               {supportsPasskey && <button className="btn btn-primary btn-block" onClick={createPasskey} disabled={busy}>Opret passkey nu</button>}
-              <button className="btn btn-ghost btn-block" onClick={() => navigate(from, { replace: true })}>
+              <button className="btn btn-ghost btn-block" onClick={() => goFrom()}>
                 {step.adminGraceLeft !== null && step.adminGraceLeft > 0
                   ? `Ikke nu (${step.adminGraceLeft} ${step.adminGraceLeft === 1 ? "login" : "logins"} til /admin tilbage)` : "Ikke nu"}
               </button>
@@ -196,7 +227,7 @@ export default function Login({ home = "/", embedded = false }: { home?: string;
                 <h2>Bekræft at det er dig</h2>
                 <p className="muted small">Din konto kræver en passkey, sikkerhedsnøgle eller kode fra din godkendelsesapp.</p>
               </div>
-              <SecondFactor methods={step.methods} onDone={async () => { await refresh(); navigate(from, { replace: true }); }} />
+              <SecondFactor methods={step.methods} onDone={async () => { await refresh(); goFrom(); }} />
             </div>
           )}
         </div>
