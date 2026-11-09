@@ -1,7 +1,7 @@
 // The user drawer on /admin/users (screen 03): facts and actions for one user.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Ban, KeyRound, LockOpen, LogOut, Mail, Phone, ScrollText, ShieldAlert, ShieldCheck, ShieldOff, UserPen, type LucideIcon } from "lucide-react";
+import { Ban, GraduationCap, KeyRound, LockOpen, LogOut, Mail, Phone, ScrollText, ShieldAlert, ShieldCheck, ShieldOff, UserPen, type LucideIcon } from "lucide-react";
 import { api, errorText } from "../../api";
 import { useAuth } from "../../auth";
 import { useAdmin } from "../context";
@@ -43,6 +43,12 @@ export default function UserDrawer({ user: u, users, grace, roles = [], onClose,
           run: run(() => api.patch(`/api/admin/users/${u.id}/role`, { role: "user" }), "Admin-rollen er fjernet"), disabled: lastAdmin || sup || !full }
       : { anchor: "user-role", label: "Gør til admin", hint: full ? "Giver fuld adgang til /admin; vælg derefter roller" : "Kræver fuld adgang", icon: ShieldCheck,
           run: run(() => api.patch(`/api/admin/users/${u.id}/role`, { role: "admin" }), "Brugeren er nu admin med fuld adgang"), disabled: !full },
+    u.is_teacher
+      ? { anchor: "user-teacher", label: "Fjern lærer", hint: "Kan ikke længere forbinde GitHub-organisationer eller oprette klasser", icon: GraduationCap,
+          run: run(() => api.del(`/api/admin/users/${u.id}/teacher`), "Lærer-adgangen er fjernet") }
+      : { anchor: "user-teacher", label: "Gør til lærer", hint: u.role === "admin" ? "Admins har allerede lærer-adgang på /class" : "Kan forbinde en GitHub-organisation og oprette klasser på /class",
+          icon: GraduationCap, disabled: test,
+          run: run(() => api.put(`/api/admin/users/${u.id}/teacher`, {}), "Brugeren er nu lærer") },
     u.blocked_at
       ? { anchor: "user-block", label: "Ophæv spærring", hint: "Brugeren kan logge ind igen", icon: LockOpen,
           run: run(() => api.post(`/api/admin/users/${u.id}/unblock`), "Spærringen er ophævet") }
@@ -89,6 +95,7 @@ export default function UserDrawer({ user: u, users, grace, roles = [], onClose,
     ["Kræv passkey", test ? "—" : u.mfa_required ? "Til" : "Fra"],
     ...(u.role === "admin" && !test ? [["Engangskoder til /admin", factorCount(u) ? "Har anden faktor" : `${u.grace_logins_used} af ${grace} brugt`] as [string, string]] : []),
     ["Sessioner", String(u.active_sessions)],
+    ["Lærer (/class)", u.is_teacher ? "Ja" : u.role === "admin" ? "Ja, som admin" : "Nej"],
     ["Feature-niveau", ring ? `Ring ${ring} · ${RING[ring][0]}` : "Ring 4 · standard"],
   ];
 

@@ -14,8 +14,8 @@ from app.mcp import hub as mcp_hub
 from app.mcp import oauth as mcp_oauth
 from app.mcp import transport as mcp_transport
 from app import route_manifest
-from app.routes import (admin, admin_ops, ai, app_store, auth, clips, data, features, files, hooks, impersonation, me,
-                        office, public, review, security, web)
+from app.routes import (admin, admin_ops, ai, app_store, auth, classroom, clips, data, features, files, hooks,
+                        impersonation, me, office, public, review, security, web)
 from app.security import bootstrap_admin_email, bootstrap_admin_phone
 from app.sessions import optional_principal
 
@@ -24,7 +24,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 # Requests that change state must carry this header. Browsers cannot add it cross-site
 # without a CORS preflight, which we never allow, so it stops CSRF together with SameSite cookies.
 CSRF_HEADER = "x-gaer"
-CSRF_EXEMPT = {"/api/collect"}  # sendBeacon cannot set headers; the endpoint only appends anonymous events
+# sendBeacon cannot set headers (collect only appends anonymous events); GitHub cannot either (the webhook checks
+# its HMAC signature instead).
+CSRF_EXEMPT = {"/api/collect", "/api/public/github/webhook"}
 CSRF_EXEMPT_PREFIXES = ("/api/hooks/in/",)  # incoming webhooks: other systems, no cookie, verified per endpoint
 
 # Who may embed us: the app itself (heatmap previews, the Office shell) and, for the embeddable
@@ -111,7 +113,7 @@ def create_app() -> FastAPI:
     for r in (auth.router, ai.router, me.router, security.router, files.router, clips.router, public.router, admin.router,
               app_store.router, data.router, features.router, features.admin_router, impersonation.router, mcp_oauth.router,
               mcp_hub.router, office.router, review.router, admin_ops.router, hooks.router,
-              web.router, files.memory_router):
+              classroom.router, classroom.public_router, classroom.admin_router, web.router, files.memory_router):
         app.include_router(r)
 
     # MCP: exact routes, so /mcp/authorize, /mcp/token and /mcp/register above stay ordinary endpoints.

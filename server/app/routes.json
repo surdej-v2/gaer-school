@@ -66,6 +66,23 @@
    ]
   },
   {
+   "id": "class",
+   "docs_path": "`/class`, `/class/teacher`, `/class/student`",
+   "who": {
+    "en": "logged in (feature `klasse`, ring 1)",
+    "da": "logget ind (feature `klasse`, ring 1)"
+   },
+   "what": {
+    "en": "**GitHub classes**: teachers (admin role, or granted in /admin/users) connect a GitHub organisation through the Gær GitHub App and create classes from a template repo; students join with a code, link their GitHub account and get their own private repo with admin rights.",
+    "da": "**GitHub-klasser**: lærere forbinder en GitHub-organisation og opretter klasser fra et skabelon-repo; elever tilmelder sig med en kode og får deres eget private repo."
+   },
+   "code": [
+    "pages/class/",
+    "routes/classroom.py",
+    "classroom.py"
+   ]
+  },
+  {
    "id": "mcp-links",
    "docs_path": "`/forbind`, `/go`",
    "who": {
@@ -174,7 +191,7 @@
     "da": "pr. endpoint"
    },
    "what": {
-    "en": "JSON API. State-changing calls need the `X-Gaer: 1` header (CSRF). Groups: `auth`, `me`, `files`, `clips`, `bridge-consent`, `ai`, `public`, `consent`, `collect`, `office`, `extension/download`, `admin`.",
+    "en": "JSON API. State-changing calls need the `X-Gaer: 1` header (CSRF). Groups: `auth`, `me`, `files`, `clips`, `bridge-consent`, `ai`, `class`, `public` (incl. the signed GitHub webhook), `consent`, `collect`, `office`, `extension/download`, `admin`.",
     "da": "JSON-API. Ændringer kræver headeren `X-Gaer: 1` (CSRF)."
    },
    "code": [
@@ -290,6 +307,30 @@
    "app": "app",
    "access": "public",
    "title": "Privatliv"
+  },
+  {
+   "path": "/class",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Klasser",
+   "feature": "klasse"
+  },
+  {
+   "path": "/class/teacher",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Klasser · lærer",
+   "feature": "klasse"
+  },
+  {
+   "path": "/class/student",
+   "group": "class",
+   "app": "app",
+   "access": "user",
+   "title": "Klasser · elev",
+   "feature": "klasse"
   },
   {
    "path": "/forbind",

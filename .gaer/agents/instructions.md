@@ -47,6 +47,7 @@ use `MAIL_PROVIDER=console` (and `SMS_PROVIDER=console`).
 | `deploy/` | `deploy.sh` (on the server), `compose.yml` (prod stack: Postgres, app, cloudflared), `postgres-init.sh`, `.env.example`, `app.env.example` |
 | `.github/workflows/` | `test.yml` (PRs), `deploy.yml` (push to main → prod) |
 | `mobile/` | Expo app (iOS + Android): native login, then `/m` in a WebView — spec in `specs/mobile/` |
+| `server/app/classroom.py`, `github.py`, `routes/classroom.py` | `/class`: GitHub App client, classes, student repo provisioning — spec in `specs/classroom/` |
 | `server/app/mcp/` | MCP servers: `/mcp` (appen, as the user) and `/mcp/admin` (admin, drafts) — spec in `specs/mcp/` |
 
 ## Routes — one server, many surfaces
@@ -61,17 +62,18 @@ They share the same login (session cookie), the same database and the same API.
 | `/w/…` | everyone | **Public website**, server-rendered HTML from Markdown pages (`web_pages`), da/en via `?lang=` + `w_lang` cookie. The front page is the Markdown page with an empty slug, or — setting `web_front = "facit246"` in `/admin/web` — the fixed "Facit · 246" story (da/en/de/sv/no, browser language by default; `web_front.py`, design in `specs/forside-246/`). The front page always ends with a **login card**; on a new instance (no users, no `BOOTSTRAP_ADMIN_EMAIL`) it says the first person to log in becomes admin. A placeholder is shown until a front page is written. | `routes/web.py`, `web_front.py`, `web_static/` |
 | `/login` | anonymous | E-mail → one-time code → second factor if "Kræv passkey" is on, else a passkey offer (see `gaer-auth`). Shows the first-user/admin notice when `first_user` is true. Also `/extension/login` and `/m/login` (same page, embedded layout). | `pages/Login.tsx` |
 | `/klip`, `/filer`, `/konto`, `/privatliv` | logged in (privatliv: everyone) | Clips, files in Object Storage, account (profile, avatar, passkeys, security keys, authenticator apps, "Kræv passkey", sessions), privacy + consent + GDPR requests. | `pages/`, `clips.tsx` |
+| `/class`, `/class/teacher`, `/class/student` | logged in (feature `klasse`, ring 1) | **GitHub classes**: teachers (admin role, or granted in /admin/users) connect a GitHub organisation through the Gær GitHub App and create classes from a template repo; students join with a code, link their GitHub account and get their own private repo with admin rights. | `pages/class/`, `routes/classroom.py`, `classroom.py` |
 | `/forbind`, `/go` | logged in | **MCP consent** (`/forbind`: a client asks for access, `mcp:admin` needs a fresh second factor) and **deep links** (`/go?path=…&focus=…`, also `/admin/go`) that open a page and focus a `data-deeplink` anchor. | `pages/McpConsent.tsx`, `deeplink.tsx`, `admin-app/go.tsx` |
 | `/admin/…` | admin role (+ MFA) | **Standalone admin app** (own Vite entry `web/admin.html`): statistics, users + impersonation, features and rings, App Stores, auth/audit log, analytics, heatmaps, GDPR, retention, consent, files, website (`/admin/web`), AI (`/admin/ai`), extension & Office (`/admin/integrations`), MCP servers (`/admin/mcp`), webhooks (`/admin/webhooks`), jobs and cleanup (`/admin/jobs`), data catalog + Udforsk + API sources (`/admin/data`), settings. Every read and change is audited. | `admin-app/`, `routes/admin.py`, `impersonation.py`, `features.py`, `app_store.py` |
 | `/m/…` | logged in | **Mobile app (PWA)**: home, AI chat (if enabled), clips, files with camera upload, profile. Bottom tab bar, own manifest + service worker scoped to `/m/`. | `mobile/Mobile.tsx`, `public/m/` |
 | `/extension/…` | logged in, inside the browser extension | **Side panel** of the Chrome/Edge extension (iframe). Current page + per-domain consent + save as clip, AI chat with the page as context, clips, account. Talks to the panel over `gaer-bridge`. | `extension/`, `web/src/extension/`, `bridge/extension.ts` |
 | `/office-addin?app=word\|excel\|powerpoint\|outlook` | public shell | **Office router**: loads Office.js, detects the host, embeds the matching tool. Must stay public (Office closes panes that do not initialise). | `office/OfficeShell.tsx`, `office/handlers.ts` |
 | `/extension/tools/word\|outlook\|document` | logged in, inside the Office shell | Office tools: insert/save clips and AI chat with the document or mail as context; Office.js calls go to the shell over `gaer-office-host`. | `office/Tools.tsx`, `bridge/officeHost.ts` |
-| `/api/…` | per endpoint | JSON API. State-changing calls need the `X-Gaer: 1` header (CSRF). Groups: `auth`, `me`, `files`, `clips`, `bridge-consent`, `ai`, `public`, `consent`, `collect`, `office`, `extension/download`, `admin`. | `routes/` |
+| `/api/…` | per endpoint | JSON API. State-changing calls need the `X-Gaer: 1` header (CSRF). Groups: `auth`, `me`, `files`, `clips`, `bridge-consent`, `ai`, `class`, `public` (incl. the signed GitHub webhook), `consent`, `collect`, `office`, `extension/download`, `admin`. | `routes/` |
 | `/mcp`, `/mcp/admin` | MCP clients (OAuth bearer) | **MCP servers** (Streamable HTTP): the app as the logged-in user, and admin where every change is a draft. Consent page `/forbind`; deep links `/go` and `/admin/go`; hub in `/admin/mcp`. OAuth: `/.well-known/oauth-*`, `/mcp/authorize`, `/mcp/token`, `/mcp/register`. | `server/app/mcp/`, skill `gaer-mcp` |
 | `/health` | deploy | Database check + version; used by `deploy/deploy.sh` before switching versions. | `main.py` |
 
-<details><summary>All routes (57)</summary>
+<details><summary>All routes (60)</summary>
 
 | Path | Served by | Access | Page |
 | --- | --- | --- | --- |
@@ -85,6 +87,9 @@ They share the same login (session cookie), the same database and the same API.
 | `/filer` | app (`index.html`) | logged in | Filer (feature `filer`) |
 | `/konto` | app (`index.html`) | logged in | Konto |
 | `/privatliv` | app (`index.html`) | everyone | Privatliv |
+| `/class` | app (`index.html`) | logged in | Klasser (feature `klasse`) |
+| `/class/teacher` | app (`index.html`) | logged in | Klasser · lærer (feature `klasse`) |
+| `/class/student` | app (`index.html`) | logged in | Klasser · elev (feature `klasse`) |
 | `/forbind` | app (`index.html`) | logged in | Forbind MCP-klient |
 | `/go` | app (`index.html`) | everyone | Deep link |
 | `/admin` | admin app (`admin.html`) | admin | Statistik |

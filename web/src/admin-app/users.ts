@@ -22,6 +22,7 @@ export type AdminUser = {
   active_sessions: number;
   impersonation_only?: boolean;
   feature_ring?: number | null;
+  is_teacher?: boolean;
 };
 
 /** An administrative role as the server describes it (server/app/admin_roles.py). */

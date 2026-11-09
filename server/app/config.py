@@ -123,6 +123,17 @@ class Settings:
     # The read-only <db>_mcp_ro user for db_query. Without it the tool answers "ikke tilgængelig".
     mcp_db_query_url: str | None = field(default_factory=lambda: _env("MCP_DB_QUERY_URL"))
 
+    # Optional GitHub App for /class (GitHub classes). /class shows a setup notice unless the app id, private
+    # key and OAuth client are set. The private key is the PEM text (newlines may be written as \n).
+    github_app_id: str | None = field(default_factory=lambda: _env("GITHUB_APP_ID"))
+    github_app_slug: str | None = field(default_factory=lambda: _env("GITHUB_APP_SLUG"))
+    github_app_private_key: str | None = field(default_factory=lambda: _env("GITHUB_APP_PRIVATE_KEY"))
+    github_client_id: str | None = field(default_factory=lambda: _env("GITHUB_CLIENT_ID"))
+    github_client_secret: str | None = field(default_factory=lambda: _env("GITHUB_CLIENT_SECRET"))
+    github_webhook_secret: str | None = field(default_factory=lambda: _env("GITHUB_WEBHOOK_SECRET"))
+    github_api_url: str = field(default_factory=lambda: _env("GITHUB_API_URL", "https://api.github.com"))
+    github_web_url: str = field(default_factory=lambda: _env("GITHUB_WEB_URL", "https://github.com"))
+
     # Browser extension source, zipped by /api/extension/download
     extension_dir: str = field(default_factory=lambda: _env("EXTENSION_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "extension")))
 

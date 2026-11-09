@@ -135,7 +135,8 @@
         "user-passkeys",
         "user-profile",
         "user-role",
-        "user-sessions"
+        "user-sessions",
+        "user-teacher"
       ]
     },
     "/admin/web": {
@@ -144,6 +145,18 @@
     },
     "/admin/webhooks": {
       "title": "Webhooks",
+      "anchors": []
+    },
+    "/class": {
+      "title": "Klasser",
+      "anchors": []
+    },
+    "/class/student": {
+      "title": "Klasser · elev",
+      "anchors": []
+    },
+    "/class/teacher": {
+      "title": "Klasser · lærer",
       "anchors": []
     },
     "/extension": {

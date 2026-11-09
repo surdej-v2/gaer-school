@@ -68,6 +68,17 @@ async def build_user_export(conn, user_id: int) -> dict:
                                          where r.user_id = %s group by r.id order by r.created_at""", user_id),
         "test_accounts": await rows("""select id, display_name, role, created_at from users
                                        where impersonation_only and impersonation_owner_id = %s""", user_id),
+        "teacher": await rows("select created_at from teachers where user_id = %s", user_id),
+        "github_account": await rows("select github_id, login, verified_at from github_accounts where user_id = %s",
+                                     user_id),
+        "github_orgs_connected": await rows("""select o.login, t.created_at from github_org_teachers t
+                                               join github_orgs o on o.id = t.org_id where t.user_id = %s""", user_id),
+        "classes": await rows("""select c.name, o.login as github_org, m.role, m.joined_at, sr.repo_name, sr.status,
+                                        sr.updated_at
+                                 from class_members m join classes c on c.id = m.class_id
+                                 join github_orgs o on o.id = c.org_id
+                                 left join student_repos sr on sr.class_id = m.class_id and sr.user_id = m.user_id
+                                 where m.user_id = %s order by m.joined_at""", user_id),
         "ai_usage": await rows("""select ts, surface, model, prompt_tokens, completion_tokens from ai_usage
                                   where user_id = %s order by ts""", user_id),
         "analytics_events": await rows("""select ts, kind, path, referrer, device, browser from analytics_events
@@ -81,10 +92,12 @@ README = """Indsigt i dine data
 data.json   alt, vi har gemt om dig: bruger og profil, passkeys og sikkerhedsnøgler, godkendelsesapps
             (uden den hemmelige nøgle), sessioner, klip, filer (oversigt), tilladte domæner,
             GDPR-anmodninger, samtykker, login-log, ændringslog, AI-forbrug, feature-niveau og -brug,
-            review-sessioner og -noter, testkonti du har oprettet og statistik knyttet til dig.
+            review-sessioner og -noter, testkonti du har oprettet, klasser og din forbundne GitHub-konto og
+            statistik knyttet til dig.
 files/      kopier af de filer, du har uploadet, dit profilbillede og skærmbilleder og lyd fra review-noter.
 
-Samtaler med AI'en bliver ikke gemt og er derfor ikke med.
+Samtaler med AI'en bliver ikke gemt og er derfor ikke med. Dine repos på GitHub ligger hos GitHub og hentes
+direkte derfra.
 """
 
 
@@ -129,7 +142,9 @@ async def ensure_can_erase(conn, user_id: int) -> dict:
 async def erase_user(user_id: int, *, actor_id: int | None, meta: RequestMeta, reason: str,
                      gdpr_request: int | None = None) -> dict:
     """The right to be forgotten. Deletes the user (passkeys, authenticator apps, sessions, clips, domain consents, AI usage, one-time
-    codes, feature level, review sessions and notes and their test accounts cascade; review screenshots and audio are files; feature usage is purged with the logs), their files in Object Storage, the contact details on their GDPR requests, and
+    codes, feature level, review sessions and notes, test accounts, teacher grant, GitHub account link, class memberships
+    and student repo rows cascade; review screenshots and audio are files; feature usage is purged with the logs; repos
+    on GitHub are not deleted), their files in Object Storage, the contact details on their GDPR requests, and
     log data about them (via the purge user). The erasure itself is logged without personal data."""
     async with db.connection() as conn:
         user = await ensure_can_erase(conn, user_id)
