@@ -13,10 +13,10 @@ import Account from "./pages/Account";
 import Files from "./pages/Files";
 import Privacy from "./pages/Privacy";
 import McpConsent from "./pages/McpConsent";
-import ClassLayout from "./pages/class/shared";
-import ClassOverview from "./pages/class/Overview";
-import ClassTeacher from "./pages/class/Teacher";
-import ClassStudent from "./pages/class/Student";
+import SchoolLayout, { SchoolHome } from "./pages/school/shared";
+import SchoolAdmin from "./pages/school/Admin";
+import SchoolTeacher from "./pages/school/Teacher";
+import SchoolStudent from "./pages/school/Student";
 import ExtensionLayout from "./extension/ExtensionLayout";
 import ExtensionPage from "./extension/ExtensionPage";
 import ExtensionAccount from "./extension/ExtensionAccount";
@@ -47,7 +47,7 @@ function TopBar() {
         <nav className="nav">
           {full && <FeatureGate feature="klip"><NavLink to="/klip">Klip</NavLink></FeatureGate>}
           {full && <FeatureGate feature="filer"><NavLink to="/filer">Filer</NavLink></FeatureGate>}
-          {full && <FeatureGate feature="klasse"><NavLink to="/class">Klasse</NavLink></FeatureGate>}
+          {full && <FeatureGate feature="klasse"><NavLink to="/school">Skole</NavLink></FeatureGate>}
           {full && <NavLink to="/konto">Konto</NavLink>}
           {full && user.role === "admin" && <a href="/admin">Admin</a>}
           {user ? (
@@ -117,10 +117,11 @@ export default function App() {
         <Route path="/klip" element={<RequireUser><FeatureGate feature="klip"><ClipsPage /></FeatureGate></RequireUser>} />
         <Route path="/klip/:id" element={<RequireUser><FeatureGate feature="klip"><ClipsPage /></FeatureGate></RequireUser>} />
         <Route path="/go" element={<GoPage />} />
-        <Route path="/class" element={<RequireUser><FeatureGate feature="klasse"><ClassLayout /></FeatureGate></RequireUser>}>
-          <Route index element={<ClassOverview />} />
-          <Route path="teacher" element={<ClassTeacher />} />
-          <Route path="student" element={<ClassStudent />} />
+        <Route path="/school" element={<RequireUser><FeatureGate feature="klasse"><SchoolLayout /></FeatureGate></RequireUser>}>
+          <Route index element={<SchoolHome />} />
+          <Route path="teacher" element={<SchoolTeacher />} />
+          <Route path="student" element={<SchoolStudent />} />
+          <Route path="admin" element={<SchoolAdmin />} />
         </Route>
 
         <Route path="/extension/login" element={<Login home="/extension" embedded />} />

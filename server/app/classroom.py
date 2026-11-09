@@ -22,7 +22,7 @@ import time
 
 from psycopg import errors
 
-from app import config, db, github
+from app import config, db, github, jobs
 from app.logs import RequestMeta, audit
 
 STATE_TTL_SECONDS = 600
@@ -32,9 +32,8 @@ JOIN_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O, 1/I
 # ── Who is a teacher ────────────────────────────────────────────────────────
 
 async def is_teacher(conn, user_id: int, role: str) -> bool:
-    if role == "admin":
-        return True
-    return await db.fetch_one(conn, "select 1 as ok from teachers where user_id = %s", (user_id,)) is not None
+    from app import school  # school imports nothing from here; the import is local to keep the modules independent
+    return await school.is_teacher(conn, user_id, role)
 
 
 # ── Signed state for GitHub redirects (bound to the Gær user) ──────────────
@@ -187,3 +186,39 @@ async def provision_user(user_id: int, *, actor_id: int | None, meta: RequestMet
                                            and status not in ('ready', 'transferred') order by class_id""", (user_id,))
     for r in rows:
         await provision_student(r["class_id"], user_id, actor_id=actor_id, meta=meta)
+
+
+# ── Background jobs (app.jobs): queued in the same transaction as the change that needs them ──
+
+async def enqueue_student(conn, class_id: int, user_id: int, actor_id: int | None) -> None:
+    await jobs.enqueue(conn, "class.provision_student", {"class_id": class_id, "user_id": user_id, "actor_id": actor_id},
+                       dedupe_key=f"class.provision:{class_id}:{user_id}")
+
+
+async def enqueue_class(conn, class_id: int, actor_id: int | None) -> None:
+    await jobs.enqueue(conn, "class.provision_class", {"class_id": class_id, "actor_id": actor_id},
+                       dedupe_key=f"class.provision_class:{class_id}")
+
+
+async def enqueue_user(conn, user_id: int, actor_id: int | None) -> None:
+    await jobs.enqueue(conn, "class.provision_user", {"user_id": user_id, "actor_id": actor_id},
+                       dedupe_key=f"class.provision_user:{user_id}")
+
+
+@jobs.handler("class.provision_student")
+async def _job_student(payload: dict, job: dict) -> dict:
+    status = await provision_student(payload["class_id"], payload["user_id"], actor_id=payload.get("actor_id"),
+                                     meta=RequestMeta())
+    return {"status": status}
+
+
+@jobs.handler("class.provision_class")
+async def _job_class(payload: dict, job: dict) -> dict:
+    await provision_class(payload["class_id"], actor_id=payload.get("actor_id"), meta=RequestMeta())
+    return {}
+
+
+@jobs.handler("class.provision_user")
+async def _job_user(payload: dict, job: dict) -> dict:
+    await provision_user(payload["user_id"], actor_id=payload.get("actor_id"), meta=RequestMeta())
+    return {}

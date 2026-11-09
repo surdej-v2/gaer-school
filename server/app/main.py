@@ -15,7 +15,7 @@ from app.mcp import oauth as mcp_oauth
 from app.mcp import transport as mcp_transport
 from app import route_manifest
 from app.routes import (admin, admin_files, admin_ops, ai, app_store, auth, classroom, clips, data, features, files, hooks,
-                        impersonation, me, nats, office, public, review, security, web)
+                        impersonation, me, nats, office, public, review, school, security, web)
 from app.security import bootstrap_admin_email, bootstrap_admin_phone
 from app.sessions import optional_principal
 
@@ -114,7 +114,8 @@ def create_app() -> FastAPI:
               admin_files.router, admin.router,  # admin_files first: /files/folders before /files/{file_id}
               app_store.router, data.router, features.router, features.admin_router, impersonation.router, mcp_oauth.router,
               mcp_hub.router, office.router, review.router, admin_ops.router, hooks.router, nats.router,
-              classroom.router, classroom.public_router, classroom.admin_router, web.router, files.memory_router):
+              classroom.router, classroom.public_router, classroom.admin_router, classroom.legacy_router, school.router,
+              school.admin_router, web.router, files.memory_router):
         app.include_router(r)
 
     # MCP: exact routes, so /mcp/authorize, /mcp/token and /mcp/register above stay ordinary endpoints.

@@ -23,6 +23,7 @@ export type AdminUser = {
   impersonation_only?: boolean;
   feature_ring?: number | null;
   is_teacher?: boolean;
+  is_school_admin?: boolean;
 };
 
 /** An administrative role as the server describes it (server/app/admin_roles.py). */

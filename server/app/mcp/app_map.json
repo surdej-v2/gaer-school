@@ -149,6 +149,7 @@
         "user-passkeys",
         "user-profile",
         "user-role",
+        "user-school-admin",
         "user-sessions",
         "user-teacher"
       ]
@@ -159,18 +160,6 @@
     },
     "/admin/webhooks": {
       "title": "Webhooks",
-      "anchors": []
-    },
-    "/class": {
-      "title": "Klasser",
-      "anchors": []
-    },
-    "/class/student": {
-      "title": "Klasser · elev",
-      "anchors": []
-    },
-    "/class/teacher": {
-      "title": "Klasser · lærer",
       "anchors": []
     },
     "/extension": {
@@ -296,6 +285,22 @@
       "anchors": [
         "privacy-export"
       ]
+    },
+    "/school": {
+      "title": "Skole",
+      "anchors": []
+    },
+    "/school/admin": {
+      "title": "Skole · administration",
+      "anchors": []
+    },
+    "/school/student": {
+      "title": "Skole · elev",
+      "anchors": []
+    },
+    "/school/teacher": {
+      "title": "Skole · lærer",
+      "anchors": []
     }
   }
 }

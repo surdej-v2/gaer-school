@@ -58,6 +58,8 @@ EVENTS: dict[str, str] = {
     "review.feedback.created": "En review-note er gemt (id, sti, feature, indtryk)",
     "review.session.ended": "En review-session er afsluttet (id, arketype, opgaver)",
     "job.dead": "Et baggrundsjob er opgivet efter alle forsøg (id, type)",
+    "school.addon.ordered": "Skolen har bestilt et tilkøb til EAN-fakturaen (id, tilkøb, antal)",
+    "school.addon.cancelled": "Skolen har opsagt et tilkøb (id, tilkøb, antal)",
 }
 
 # Tests replace this with an httpx.MockTransport.

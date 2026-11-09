@@ -1,4 +1,4 @@
-// /class/teacher: create classes, share the join code, create the students' repos and follow their status.
+// /school/teacher: create classes, share the join code, create the students' repos and follow their status.
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../../api";
@@ -136,7 +136,7 @@ function ClassView({ id }: { id: number }) {
         {!c.archived_at && (
           <div className="grid" style={{ "--min": "260px" } as React.CSSProperties}>
             <CopyField id="join-code" label="Tilmeldingskode til eleverne" value={c.join_code} />
-            <CopyField id="join-link" label="Eller send linket" value={`${window.location.origin}/class/student?kode=${c.join_code}`} />
+            <CopyField id="join-link" label="Eller send linket" value={`${window.location.origin}/school/student?kode=${c.join_code}`} />
           </div>
         )}
         <p className="muted small">
@@ -195,8 +195,8 @@ export default function Teacher() {
   if (!me.is_teacher) {
     return (
       <Alert kind="info">
-        Lærer-siden kræver lærer-adgang. En administrator kan give dig den under /admin → Brugere.{" "}
-        Er du elev, så gå til <Link to="/class/student">Elev</Link>.
+        Lærer-siden kræver lærer-adgang. Skolens administrator kan give dig den.{" "}
+        Er du elev, så gå til <Link to="/school/student">Elev</Link>.
       </Alert>
     );
   }
@@ -212,12 +212,20 @@ export default function Teacher() {
             {c.name}{c.archived_at && <span className="muted tiny"> · arkiveret</span>}
           </button>
         ))}
-        <button type="button" className={`new ${creating ? "active" : ""}`} onClick={() => select({ ny: "1" })}>+ Ny klasse</button>
+        {me.can_create_classes && (
+          <button type="button" className={`new ${creating ? "active" : ""}`} onClick={() => select({ ny: "1" })}>+ Ny klasse</button>
+        )}
+        {!me.can_create_classes && <p className="muted tiny" style={{ padding: "4px 10px" }}>Skolens administrator opretter klasserne.</p>}
       </nav>
       <div style={{ flex: "999 1 560px", minWidth: 0 }}>
-        {creating || !selected
-          ? <NewClass onCreated={(id) => select({ klasse: String(id) })} onCancel={() => select({})} />
-          : <ClassView key={selected} id={selected} />}
+        {selected && !creating ? <ClassView key={selected} id={selected} />
+          : me.can_create_classes ? <NewClass onCreated={(id) => select({ klasse: String(id) })} onCancel={() => select({})} />
+          : (
+            <div className="card">
+              <h3>Ingen klasser endnu</h3>
+              <p className="muted small">Skolens administrator opretter klasserne og sætter dig på som lærer.</p>
+            </div>
+          )}
       </div>
     </div>
   );

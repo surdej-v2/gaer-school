@@ -1,7 +1,7 @@
-// /class: shared data and pieces for the overview, teacher and student pages.
+// /school: shared data and pieces for the teacher, student and school administrator pages.
 // The layout loads /api/class/me once and hands it to the sub pages through the router outlet.
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useOutletContext, useSearchParams } from "react-router-dom";
+import { Navigate, NavLink, Outlet, useOutletContext, useSearchParams } from "react-router-dom";
 import { api, errorText } from "../../api";
 import { Alert, Loading, useLoad } from "../../ui";
 
@@ -24,6 +24,8 @@ export type LearningClass = {
 export type ClassMe = {
   github: { configured: boolean; account: { login: string; verified_at: string } | null };
   is_teacher: boolean;
+  is_school_admin: boolean;
+  can_create_classes: boolean;
   orgs: Org[];
   teaching: TeachingClass[];
   learning: LearningClass[];
@@ -123,20 +125,32 @@ export function CopyField({ id, label, value }: { id: string; label: string; val
   );
 }
 
-export default function ClassLayout() {
+/** /school sends you to your role: school administrator, then teacher, then student. */
+export function SchoolHome() {
+  const { me } = useClassMe();
+  const [params] = useSearchParams();
+  const target = me.is_school_admin ? "/school/admin" : me.is_teacher ? "/school/teacher" : "/school/student";
+  const query = params.toString();
+  return <Navigate to={query ? `${target}?${query}` : target} replace />;
+}
+
+export default function SchoolLayout() {
   const me = useLoad(() => api.get<ClassMe>("/api/class/me"));
+  const staff = !!me.data && (me.data.is_teacher || me.data.is_school_admin);
   return (
     <div className="page">
       <div className="spread">
         <div className="stack" style={{ "--gap": "6px" } as React.CSSProperties}>
           <div className="eyebrow">GitHub-klasser</div>
-          <h2>Klasse</h2>
+          <h2>Skole</h2>
         </div>
-        <nav className="subnav" aria-label="Klasse-visning">
-          <NavLink to="/class" end>Oversigt</NavLink>
-          <NavLink to="/class/teacher">Lærer</NavLink>
-          <NavLink to="/class/student">Elev</NavLink>
-        </nav>
+        {staff && (
+          <nav className="subnav" aria-label="Skole-visning">
+            {me.data?.is_teacher && <NavLink to="/school/teacher">Lærer</NavLink>}
+            <NavLink to="/school/student">Elev</NavLink>
+            {me.data?.is_school_admin && <NavLink to="/school/admin">Skoleadmin</NavLink>}
+          </nav>
+        )}
       </div>
       <GitHubReturn />
       {me.error && <Alert>{me.error}</Alert>}

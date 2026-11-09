@@ -1,14 +1,16 @@
-# Klasse — GitHub classes (`/class`)
+# Skole — school administration and GitHub classes (`/school`)
 
-A teacher connects a GitHub organisation, creates classes from a template repo, and every student gets their own
-private repo in the organisation with **admin** rights. Design canvas:
+A school administrator runs the school on `/school/admin`; a teacher connects a GitHub organisation, creates classes from
+a template repo, and every student gets their own private repo in the organisation with **admin** rights. Design canvas:
 https://claude.ai/artifact/9kcLpSHD1VfAQAeXhPf1F1
 
 | Route | Who | What |
 | --- | --- | --- |
-| `/class` | logged in | Dashboard: organisation, key figures, classes, "Kræver handling". Students see their classes. |
-| `/class/teacher` | teachers | Create classes, share the join code, create repos, follow each student's status, transfer at course end. |
-| `/class/student` | logged in | Connect GitHub → accept the invitation → own repo. Join with a code (`?kode=` prefills it). |
+| `/school` | logged in | Sends you to your role: school administrator → `/school/admin`, teacher → `/school/teacher`, else `/school/student`. |
+| `/school/admin` | school administrators | Tabs (`?fane=`): Oversigt, Lærere, Elever, Klasser, Forbrug, Tilkøb, Organisation. |
+| `/school/teacher` | teachers | Create classes, share the join code, create repos, follow each student's status, transfer at course end. |
+| `/school/student` | logged in | Connect GitHub → accept the invitation → own repo. Join with a code (`?kode=` prefills it). |
+| `/class/…` | — | 301 to `/school/…`, so join links shared before the move keep working. |
 
 Behind feature `klasse` (ring 1). Raise the ring in `/admin/features` when it is ready for everyone.
 
@@ -22,7 +24,11 @@ Behind feature `klasse` (ring 1). Raise the ring in `/admin/features` when it is
 - **GitHub App, not personal tokens.** Gær acts with installation tokens. The private key stays in an environment variable.
 - **GitHub never logs anyone in.** Login to Gær is unchanged. A GitHub account is only *linked* to a Gær user,
   proved through the app's user authorisation. One GitHub account per Gær user.
-- **Teachers** = users with the admin role, or users an admin marks as teacher in `/admin/users` (table `teachers`).
+- **School administrators** = users with the admin role, or a row in `school_admins` (granted in `/admin/users` with
+  step-up, or by another school administrator in `/school/admin`). They manage teachers, students, classes, usage,
+  limits, the subscription and add-ons, and the school rules.
+- **Teachers** = school administrators, or a row in `teachers`. A school administrator adds teachers by e-mail; an e-mail
+  that has not logged in yet becomes a `school_invites` row and the role is granted the first time that user opens `/school`.
   A teacher only sees organisations they proved access to (`github_org_teachers`) and classes they teach (`class_members`).
 
 ## Flow
@@ -34,7 +40,7 @@ Behind feature `klasse` (ring 1). Raise the ring in `/admin/features` when it is
 2. Teacher creates a class: the template must have `is_template`; Gær creates the teams `<slug>` (students) and
    `<slug>-laerere` (teachers, the teacher added as maintainer) and a join code `XXXX-XXXX`.
 3. Student joins with the code (`class_members`, `student_repos` = `waiting_account` or `pending`) and links GitHub.
-4. Provisioning (`app/classroom.py`, one student at a time, row locked with `for update nowait`):
+4. Provisioning (`app/classroom.py`, background jobs `class.provision_*` in `app.jobs`, one student at a time, row locked with `for update nowait`):
    invite to the student team → `invited` until accepted → generate repo (`created`, `repo_created_at`) →
    student `admin` + teachers' team `maintain` → `ready`. Errors → `failed` + `last_error`; *Opret manglende repos* retries,
    and a repo that was already generated is never generated again.
@@ -43,9 +49,35 @@ Behind feature `klasse` (ring 1). Raise the ring in `/admin/features` when it is
 
 Every change writes `audit()` in the same transaction. Webhook-driven changes have no actor.
 
+## School administration (`/school/admin`)
+
+- **Seats**: `school_subscription.seats` + 25 per active `seats` add-on. A student uses a seat while they are in a class
+  that is not archived. Joining a class needs a free seat (409 otherwise). Without a subscription row there is no limit.
+- **Storage**: `storage_gb` + 100 GB per `storage` add-on, shown against all files (not enforced yet).
+- **AI**: "pr. bruger" is the instance default `ai_default_monthly_tokens`; "for hele skolen" (`school_ai_monthly_tokens`,
+  0 = none) stops AI for everyone for the rest of the month when reached (`routes/ai.py`).
+- **School rules** (`settings`): `school_student_email_domain` (students must log in with that domain to join a class) and
+  `school_teachers_create_classes` (otherwise only school administrators create classes).
+- **Påmind**: one background job per student without a GitHub account sends a mail (`school.remind_github`).
+
+## Subscription, add-ons and EAN invoicing
+
+Nothing is paid in Gær. Happy Mates invoices the school by **EAN**:
+
+1. A Gær admin (Happy Mates) sets plan, seats, storage, price and add-on prices in Tilkøb → "Abonnement og priser".
+2. The school administrator enters the EAN number and invoice reference, and becomes the contact person.
+3. Add-ons (catalog in `app/school.py`: `seats`, `storage`, `ai`, `courses`, `support`) are ordered and cancelled by a
+   school administrator. Each order is audited and emits the webhook `school.addon.ordered` / `school.addon.cancelled`
+   (ids only), so Happy Mates can be notified through `/admin/webhooks`.
+4. "Hent fakturagrundlag (CSV)" (`/api/school/admin/billing.csv`) lists the subscription and every order for the invoice.
+
+Only `seats` and `storage` change limits in Gær; the other add-ons are registered for the invoice. GitHub Codespaces and
+Actions are bought and paid in the organisation on GitHub.
+
 ## Personal data
 
-`github_accounts` (GitHub id + login), `class_members`, `student_repos`, `teachers`, `github_org_teachers` are in the
+`github_accounts` (GitHub id + login), `class_members`, `student_repos`, `teachers`, `github_org_teachers`,
+`school_admins`, `school_invites` (by e-mail), add-on orders and the billing contact are in the
 GDPR export (`build_user_export`) and cascade on erasure. **Repos on GitHub are not deleted** by an erasure — they live
 in the school's organisation (or the student's own account after a transfer). Removing a student from a class or
 archiving a class does not touch GitHub either.
