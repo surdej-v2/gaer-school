@@ -24,10 +24,11 @@ export default function Users() {
   const [q, setQ] = useState("");
   const { data, error, reload } = useLoad(() => api.get<UsersResponse>("/api/admin/users?limit=500"), []);
   const filter = params.get("filter") ?? "all";
-  const selected = Number(params.get("user")) || null;
+  const selected = Number(params.get("user") ?? params.get("userId")) || null;
 
   const setParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(params);
+    if (key === "user") next.delete("userId");
     if (value) next.set(key, value); else next.delete(key);
     setParams(next, { replace: key === "filter" });
   };
@@ -101,7 +102,7 @@ export default function Users() {
         </div>
         <div style={{ padding: "10px 16px", fontSize: 12, color: "#64748b" }}>{rows.length} af {users.length} brugere</div>
       </div>
-      {sel && <UserDrawer user={sel} users={users} grace={grace} onClose={() => setParam("user", null)} onChanged={reload} />}
+      {sel && <UserDrawer user={sel} users={users} grace={grace} roles={data?.admin_roles ?? []} onClose={() => setParam("user", null)} onChanged={reload} />}
     </div>
   );
 }

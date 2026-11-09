@@ -1,5 +1,5 @@
 // Entry of the standalone admin app on /admin (web/admin.html). Shares only the login cookie, api.ts,
-// auth.tsx and bridge/ with the app on /; shell, components and styles are its own (enforced in vite.config.ts).
+// auth.tsx, bridge/, deeplink.tsx and routes.json with the app on /; shell, components and styles are its own (enforced in vite.config.ts).
 import { StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -27,6 +27,14 @@ import Web from "./pages/Web";
 import Integrations from "./pages/Integrations";
 import AiAdmin from "./pages/AiAdmin";
 import Settings from "./pages/Settings";
+import Mcp from "./pages/Mcp";
+import Webhooks from "./pages/Webhooks";
+import Jobs from "./pages/Jobs";
+import DataCatalog from "./pages/data/Catalog";
+import DataDataset from "./pages/data/Dataset";
+import DataExplore from "./pages/data/Explore";
+import DataConnect from "./pages/data/Connect";
+import { AdminGo } from "./go";
 import "./base.css";
 import "./admin.css";
 
@@ -37,7 +45,7 @@ function RequireAdmin({ children }: { children: ReactNode }) {
   const { user, scope, loading } = useAuth();
   if (loading) return null;
   if (!user || scope !== "full") {
-    window.location.replace("/login");
+    window.location.replace(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
     return null;
   }
   if (user.role !== "admin") {
@@ -66,6 +74,7 @@ createRoot(document.getElementById("root")!).render(
             <AdminStepUp />
             <AdminProvider>
               <Routes>
+                <Route path="go" element={<AdminGo />} />
                 <Route element={<AdminShell />}>
                   <Route index element={<Stats />} />
                   <Route path="users" element={<Users />} />
@@ -81,6 +90,13 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="files" element={legacy(<AdminFiles />)} />
                   <Route path="ai" element={legacy(<AiAdmin />)} />
                   <Route path="integrations" element={legacy(<Integrations />)} />
+                  <Route path="mcp" element={<Mcp />} />
+                  <Route path="webhooks" element={legacy(<Webhooks />)} />
+                  <Route path="jobs" element={legacy(<Jobs />)} />
+                  <Route path="data" element={<DataCatalog />} />
+                  <Route path="data/explore" element={<DataExplore />} />
+                  <Route path="data/connect" element={<DataConnect />} />
+                  <Route path="data/:id" element={<DataDataset />} />
                   <Route path="gdpr" element={legacy(<Gdpr />)} />
                   <Route path="retention" element={legacy(<Retention />)} />
                   <Route path="consent" element={legacy(<Consent />)} />

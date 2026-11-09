@@ -27,18 +27,92 @@ herfra ind i sin fork.
 
 Én server og ét domæne. Stien afgør, hvilken flade der svarer. Alle deler login, database og API.
 
+<!-- routes:start -->
+<!-- Genereret fra web/src/routes.json af npm run app-map --prefix web — ret manifestet, ikke tabellen. -->
 | Rute | Hvem | Hvad |
 | --- | --- | --- |
 | `/` | logget ind | Appens forside. Anonyme sendes til `/w/`. |
-| `/w/…` | alle | Offentligt website (Markdown fra `/admin/web`, dansk/engelsk). Forsiden har altid et login-kort; på en ny instans står der, at den første, der logger ind, bliver administrator. |
-| `/login` | anonyme | Telefonnummer → engangskode → passkey. Viser, når man bliver den første admin. |
-| `/klip`, `/filer`, `/konto`, `/privatliv` | logget ind | Klip, filer, konto og passkeys, privatliv og GDPR. |
-| `/admin/…` | admin | Administration. Alt logges. |
+| `/w/…` | alle | Offentligt website: Markdown-sider fra `/admin/web` (dansk/engelsk). Forsiden er Markdown-siden eller „Facit · 246“ (valgt i `/admin/web`) og slutter altid med et login-kort; på en ny instans står der, at den første, der logger ind, bliver administrator. |
+| `/login` | anonyme | E-mail → engangskode → anden faktor, hvis „Kræv passkey“ er slået til, ellers tilbud om passkey. Viser, når man bliver den første admin. Også `/extension/login` og `/m/login`. |
+| `/klip`, `/filer`, `/konto`, `/privatliv` | logget ind (privatliv: alle) | Klip, filer, konto (profil, passkeys, sikkerhedsnøgler, godkendelsesapps, „Kræv passkey“, sessioner), privatliv og GDPR. |
+| `/class`, `/class/teacher`, `/class/student` | logget ind (feature `klasse`, ring 1) | **GitHub-klasser**: lærere forbinder en GitHub-organisation og opretter klasser fra et skabelon-repo; elever tilmelder sig med en kode og får deres eget private repo. |
+| `/forbind`, `/go` | logget ind | **MCP-samtykke** (`/forbind`: en klient beder om adgang; `mcp:admin` kræver frisk anden faktor) og **deep links** (`/go?path=…&focus=…`, også `/admin/go`), der åbner en side og fokuserer et `data-deeplink`-anker. |
+| `/admin/…` | admin (+ MFA) | Administration — en selvstændig app (`web/admin.html`). Kræver anden faktor efter tre logins med engangskode. Alt logges. |
 | `/m/…` | logget ind | Mobil-app (PWA) med bundmenu, AI, klip, filer og profil. |
 | `/extension/…` | i browserudvidelsen | Sidepanelet: aktuel side, klip og AI med siden som kontekst. |
-| `/office-addin` | Office | Router for Word, Excel, PowerPoint og Outlook → værktøjerne under `/extension/tools/…`. |
-| `/api/…` | | JSON-API. |
-| `/health` | udrulning | Sundhedstjek. |
+| `/office-addin?app=word\|excel\|powerpoint\|outlook` | Office (offentlig skal) | Router for Word, Excel, PowerPoint og Outlook → værktøjerne under `/extension/tools/…`. |
+| `/extension/tools/word\|outlook\|document` | logget ind, i Office | Office-værktøjer: indsæt/gem klip og AI med dokumentet eller mailen som kontekst. |
+| `/api/…` | pr. endpoint | JSON-API. Ændringer kræver headeren `X-Gaer: 1` (CSRF). |
+| `/mcp`, `/mcp/admin` | MCP-klienter (OAuth) | MCP-servere: appen som den indloggede bruger og admin med kladder. OAuth: `/.well-known/oauth-*`, `/mcp/authorize`, `/mcp/token`, `/mcp/register`. |
+| `/health` | udrulning | Sundhedstjek (database + version), bruges af `deploy/deploy.sh`. |
+
+<details><summary>Alle ruter (60)</summary>
+
+| Sti | Svarer | Adgang | Side |
+| --- | --- | --- | --- |
+| `/` | appen | logget ind | Forside |
+| `/w/{slug}` | serveren | alle | Website |
+| `/login` | appen | alle | Log ind · kan indlejres |
+| `/extension/login` | appen | alle | Log ind i udvidelsen · eget layout · kan indlejres |
+| `/m/login` | appen | alle | Log ind på mobil · eget layout |
+| `/klip` | appen | logget ind | Klip (feature `klip`) |
+| `/klip/:id` | appen | logget ind | Klip (feature `klip`) |
+| `/filer` | appen | logget ind | Filer (feature `filer`) |
+| `/konto` | appen | logget ind | Konto |
+| `/privatliv` | appen | alle | Privatliv |
+| `/class` | appen | logget ind | Klasser (feature `klasse`) |
+| `/class/teacher` | appen | logget ind | Klasser · lærer (feature `klasse`) |
+| `/class/student` | appen | logget ind | Klasser · elev (feature `klasse`) |
+| `/forbind` | appen | logget ind | Forbind MCP-klient |
+| `/go` | appen | alle | Deep link |
+| `/admin` | admin-appen | admin | Statistik |
+| `/admin/go` | admin-appen | admin | Deep link |
+| `/admin/users` | admin-appen | admin | Brugere og roller |
+| `/admin/impersonation` | admin-appen | admin | Efterligning |
+| `/admin/features` | admin-appen | admin | Features og ringe |
+| `/admin/app-stores` | admin-appen | admin | App Stores |
+| `/admin/app-stores/:tab` | admin-appen | admin | App Stores |
+| `/admin/analytics` | admin-appen | admin | Analytics |
+| `/admin/heatmaps` | admin-appen | admin | Heatmaps |
+| `/admin/logs/auth` | admin-appen | admin | Auth-log |
+| `/admin/logs/audit` | admin-appen | admin | Audit-log |
+| `/admin/web` | admin-appen | admin | Website |
+| `/admin/files` | admin-appen | admin | Filer |
+| `/admin/ai` | admin-appen | admin | AI |
+| `/admin/integrations` | admin-appen | admin | Udvidelse og Office |
+| `/admin/mcp` | admin-appen | admin | MCP-servere |
+| `/admin/webhooks` | admin-appen | admin | Webhooks |
+| `/admin/jobs` | admin-appen | admin | Jobs og oprydning |
+| `/admin/data` | admin-appen | admin | Katalog |
+| `/admin/data/explore` | admin-appen | admin | Udforsk |
+| `/admin/data/connect` | admin-appen | admin | Forbind API |
+| `/admin/data/:id` | admin-appen | admin | Datasæt |
+| `/admin/gdpr` | admin-appen | admin | GDPR-forespørgsler |
+| `/admin/retention` | admin-appen | admin | Sletning af logdata |
+| `/admin/consent` | admin-appen | admin | Samtykke og cookies |
+| `/admin/settings` | admin-appen | admin | Indstillinger |
+| `/m` | appen | logget ind | Hjem · eget layout |
+| `/m/klip` | appen | logget ind | Klip · eget layout |
+| `/m/chat` | appen | logget ind | AI · eget layout |
+| `/m/filer` | appen | logget ind | Filer · eget layout |
+| `/m/profil` | appen | logget ind | Profil · eget layout |
+| `/extension` | appen | logget ind | Aktuel side · eget layout · kan indlejres |
+| `/extension/chat` | appen | logget ind | AI · eget layout · kan indlejres |
+| `/extension/klip` | appen | logget ind | Klip · eget layout · kan indlejres |
+| `/extension/konto` | appen | logget ind | Konto · eget layout · kan indlejres |
+| `/office-addin` | appen | alle | Office-router · eget layout · kan indlejres |
+| `/extension/tools` | appen | logget ind | Office-værktøjer · eget layout · kan indlejres |
+| `/extension/tools/word` | appen | logget ind | Word · eget layout · kan indlejres |
+| `/extension/tools/outlook` | appen | logget ind | Outlook · eget layout · kan indlejres |
+| `/extension/tools/document` | appen | logget ind | Dokument · eget layout · kan indlejres |
+| `/api/{path}` | serveren | alle | API · kan indlejres |
+| `/mcp` | serveren | OAuth | MCP (appen) |
+| `/mcp/admin` | serveren | OAuth | MCP (admin) |
+| `/.well-known/{name}` | serveren | alle | OAuth-metadata |
+| `/health` | serveren | alle | Sundhedstjek |
+
+</details>
+<!-- routes:end -->
 
 ## GDPR
 
@@ -84,45 +158,58 @@ rettighederne på log-tabellerne bliver testet. Passkeys testes med en software-
 ## Arkitektur
 
 ```
-           Caddy (TLS, Let's Encrypt)
-                     │
-        ┌────────────▼────────────┐
-        │  Container  gaer        │        OVHcloud · managed
-        │  ┌───────────────────┐  │     ┌──────────────────────────────┐
-        │  │ Python (FastAPI)  │──┼────►│ PostgreSQL-cluster (fælles)  │
-        │  │  /api  /w  /health│  │     │  gaer_<kunde>  ← egen db     │
-        │  │  serverer web/dist│──┼──┐  └──────────────────────────────┘
-        │  └───────────────────┘  │  │  ┌──────────────────────────────┐
-        └─────────────────────────┘  └─►│ Object Storage (S3)          │
+        Cloudflare Tunnel (TLS, ingen åbne porte)
+                     │  cloudflared
+   Server · docker compose (deploy/compose.yml)
+        ┌────────────▼────────────┐     ┌──────────────────────────────┐
+        │  Container  app         │────►│ Container  postgres          │
+        │  Python (FastAPI)       │     │  gaer_<kunde>  ← egen db     │
+        │  /api /w /mcp /health   │     └──────────────────────────────┘
+        │  serverer web/dist      │     ┌──────────────────────────────┐
+        └─────────────────────────┘────►│ Object Storage (S3)          │
                                         └──────────────────────────────┘
 ```
 
-Tre databasebrugere pr. container, oprettet med `deploy/provision_database.py`:
+Databasebrugere, oprettet af `deploy/postgres-init.sh`, første gang Postgres-volumet er tomt (eller med
+`deploy/provision_database.py` på en managed PostgreSQL-klynge):
 
 | Bruger | Miljøvariabel | Rettigheder |
 | --- | --- | --- |
 | `gaer_<navn>_owner` | `MIGRATION_DATABASE_URL` | ejer skemaet, kører migrationer |
 | `gaer_<navn>_app` | `DATABASE_URL` | appen; kun SELECT/INSERT på log-tabeller |
 | `gaer_<navn>_purge` | `PURGE_DATABASE_URL` | sletning af logdata fra /admin |
+| `gaer_<navn>_mcp_ro` | `MCP_DB_QUERY_URL` | kun SELECT, for `db_query` i /mcp/admin; aldrig hemmeligheder (valgfri) |
 
-Ingen af dem kan forbinde til andre containeres databaser.
+Ingen af dem kan forbinde til andre instansers databaser.
 
 ## Udrulning
 
 Push til `main` → `.github/workflows/deploy.yml`:
 
 1. Test (Python mod Postgres, build af frontend)
-2. Byg ét image, tagget med commit-sha
-3. Push til OVHcloud Managed Private Registry
-4. Migrér containerens egen database (kører på instansen, som er den eneste med adgang til clusteren)
-5. Start den nye version ved siden af den gamle. Svarer `/health` inden for 60 sekunder, skiftes der; ellers
-   bliver den gamle stående. `deploy.sh rollback` starter den forrige version.
+2. Byg ét image, tagget med commit-sha, og send det direkte til UpCloud-serveren over SSH (`docker save | docker load`)
+3. Kopiér `deploy/compose.yml`, `deploy/postgres-init.sh` og `deploy/deploy.sh` til `~/gaer` på UpCloud-serveren
+4. `deploy.sh release`: start Postgres, migrér databasen, start den nye version med `docker compose`.
+   Svarer `/health` ikke inden for 60 sekunder, startes den forrige version igen.
+   `deploy.sh rollback` starter den forrige version.
 
-GitHub-secrets: `OVH_REGISTRY`, `OVH_REGISTRY_USER`, `OVH_REGISTRY_PASSWORD`, `HOST`, `SSH_KEY`.
-Variabel: `DOMAIN` (til smoke test). Instansens `~/gaer/.env` laves ud fra `deploy/.env.example`.
+Stakken (`deploy/compose.yml`) er Postgres (egen database med de tre brugere), appen og `cloudflared`,
+som sender trafik ind via en Cloudflare Tunnel — serveren har ingen åbne web-porte.
 
-> Afvigelse fra produktsiden: `DATABASE_URL` er ikke et GitHub-secret. Migrationerne kører på instansen,
-> så den fælles cluster kun skal åbne for instansernes IP'er og ikke for GitHubs runners.
+GitHub-environment **production** skal have secrets `HOST` (serverens IP), `SSH_KEY` (privat deploy-nøgle
+til brugeren `deploy`) og `SSH_KNOWN_HOSTS` (`ssh-keyscan <host>`), samt variablen `DOMAIN` (smoke test).
+På serveren laves `~/gaer/.env` ud fra `deploy/.env.example` og `~/gaer/app.env` ud fra
+`deploy/app.env.example`.
+
+`postgres-init.sh` kører kun på et tomt volume. Har en eksisterende server ikke `<db>_mcp_ro` (fra før MCP), så
+sæt `DB_MCP_RO_PASSWORD` i `~/gaer/.env` og opret rollen én gang; den næste udrulning giver den rettighederne:
+
+```bash
+cd ~/gaer && set -a && . ./.env && set +a
+docker compose -f compose.yml exec -T postgres psql -U postgres \
+  -c "create role ${DB_NAME}_mcp_ro login password '$DB_MCP_RO_PASSWORD'" \
+  -c "grant connect on database $DB_NAME to ${DB_NAME}_mcp_ro"
+```
 
 ## Browserudvidelse og Office
 
@@ -136,5 +223,6 @@ gælder inde i udvidelsen/Office.
 
 ## Konfiguration
 
-Alle indstillinger er miljøvariabler — se `.env.example` (lokalt) og `deploy/.env.example` (produktion) og
+Alle indstillinger er miljøvariabler — se `.env.example` (lokalt), `deploy/app.env.example` og `deploy/.env.example`
+(produktion: appens indstillinger og stakkens hemmeligheder) og
 `server/app/config.py`. Navn, logo, SMS-afsender, GDPR-mail, cookie-tekster og opbevaringsperioder sættes i /admin.

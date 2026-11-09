@@ -57,6 +57,11 @@ class Settings:
     # /admin: a second factor (or a grace login) counts for this long; security actions need one within STEPUP_MINUTES.
     admin_mfa_hours: int = field(default_factory=lambda: _int("ADMIN_MFA_HOURS", 12))
     stepup_minutes: int = field(default_factory=lambda: _int("STEPUP_MINUTES", 15))
+    # Captcha on POST /api/auth/otp/start (account creation and login with a code): "pow" (proof of work, no third
+    # party) or "off". CAPTCHA_MAX_NUMBER sets the work: the browser needs about half as many SHA-256 hashes.
+    captcha: str = field(default_factory=lambda: _env("CAPTCHA", "pow"))
+    captcha_max_number: int = field(default_factory=lambda: _int("CAPTCHA_MAX_NUMBER", 50_000))
+    captcha_ttl_seconds: int = field(default_factory=lambda: _int("CAPTCHA_TTL_SECONDS", 600))
     # Authenticator-app secrets are encrypted with these keys ("<version>:<base64 32 bytes>,…", first = current).
     totp_keys: str | None = field(default_factory=lambda: _env("TOTP_KEYS"))
 
@@ -93,10 +98,12 @@ class Settings:
     max_upload_mb: int = field(default_factory=lambda: _int("MAX_UPLOAD_MB", 25))
     download_link_seconds: int = field(default_factory=lambda: _int("DOWNLOAD_LINK_SECONDS", 300))
 
-    # Set to 1 when running behind the Caddy proxy from deploy/, so client IPs come from X-Forwarded-For.
+    # Set to 1 when running behind the proxy in deploy/ (cloudflared), so client IPs come from X-Forwarded-For.
     trust_proxy: bool = field(default_factory=lambda: _env("TRUST_PROXY", "0") == "1")
 
     # Static frontend (built Vite output)
+    # /w/ until an admin chooses in /admin/web: "markdown" (the page with slug '') or "facit246" (the 246 story).
+    web_front: str = field(default_factory=lambda: _env("WEB_FRONT", "markdown"))
     static_dir: str = field(default_factory=lambda: _env("STATIC_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "web", "dist")))
 
     # Optional AI chat. OpenAI-compatible endpoint; default OVHcloud AI Endpoints (processed in Europe).
@@ -106,6 +113,15 @@ class Settings:
     ai_model: str = field(default_factory=lambda: _env("AI_MODEL", "Meta-Llama-3_3-70B-Instruct"))
     ai_max_output_tokens: int = field(default_factory=lambda: _int("AI_MAX_OUTPUT_TOKENS", 1500))
     ai_max_context_chars: int = field(default_factory=lambda: _int("AI_MAX_CONTEXT_CHARS", 24000))
+
+    # MCP servers (specs/mcp): /mcp for the app, /mcp/admin for admin. 0 turns a server off (404).
+    mcp_app_enabled: bool = field(default_factory=lambda: _env("MCP_APP_ENABLED", "1") == "1")
+    mcp_admin_enabled: bool = field(default_factory=lambda: _env("MCP_ADMIN_ENABLED", "1") == "1")
+    mcp_draft_ttl_min: int = field(default_factory=lambda: _int("MCP_DRAFT_TTL_MIN", 10))
+    mcp_access_token_minutes: int = field(default_factory=lambda: _int("MCP_ACCESS_TOKEN_MINUTES", 60))
+    mcp_refresh_token_days: int = field(default_factory=lambda: _int("MCP_REFRESH_TOKEN_DAYS", 30))
+    # The read-only <db>_mcp_ro user for db_query. Without it the tool answers "ikke tilgængelig".
+    mcp_db_query_url: str | None = field(default_factory=lambda: _env("MCP_DB_QUERY_URL"))
 
     # Optional GitHub App for /class (GitHub classes). /class shows a setup notice unless the app id, private
     # key and OAuth client are set. The private key is the PEM text (newlines may be written as \n).
@@ -121,8 +137,16 @@ class Settings:
     # Browser extension source, zipped by /api/extension/download
     extension_dir: str = field(default_factory=lambda: _env("EXTENSION_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "extension")))
 
-    # Background maintenance (retention, cleanup). Disabled in tests.
+    # Background jobs: the worker and the scheduler (retention, cleanup, webhook deliveries). Disabled in tests.
     run_maintenance: bool = field(default_factory=lambda: _env("RUN_MAINTENANCE", "1") == "1")
+    job_workers: int = field(default_factory=lambda: _int("JOB_WORKERS", 2))
+    job_poll_seconds: float = field(default_factory=lambda: float(_env("JOB_POLL_SECONDS", "2")))
+    job_timeout_seconds: int = field(default_factory=lambda: _int("JOB_TIMEOUT_SECONDS", 600))
+
+    # Outgoing webhooks. Secrets and auth headers are encrypted with SECRET_BOX_KEYS (see app.secrets_box).
+    # WEBHOOK_ALLOW_PRIVATE=1 allows http and private/loopback addresses (development only).
+    secret_box_keys: str | None = field(default_factory=lambda: _env("SECRET_BOX_KEYS"))
+    webhook_allow_private: bool = field(default_factory=lambda: _env("WEBHOOK_ALLOW_PRIVATE", "0") == "1")
 
     @property
     def is_production(self) -> bool:
@@ -134,6 +158,14 @@ class Settings:
 
 
 settings = Settings()
+
+
+def data_secret(name: str) -> str | None:
+    """Keys for API sources in /admin → Data. A kildebeskrivelse names the variable; only DATA_SECRET_* can be read,
+    so a description can never send another setting (DATABASE_URL, SECRET_KEY …) to an API."""
+    if not name.startswith("DATA_SECRET_") or not name.replace("_", "").isalnum() or not name.isupper():
+        return None
+    return _env(name)
 
 
 def reload() -> Settings:
